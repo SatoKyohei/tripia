@@ -1,0 +1,66 @@
+<mxfile host="65bd71144e">
+    <diagram id="c4VSnBTS9W6G9shR4sSZ" name="ページ1">
+        <mxGraphModel dx="902" dy="816" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="&lt;h1&gt;親プラン&lt;/h1&gt;&lt;div&gt;親プランID &lt;font color=&quot;#80ff00&quot;&gt;[PK]&lt;/font&gt;&lt;/div&gt;&lt;div&gt;プラン画像URL&lt;/div&gt;&lt;div&gt;プラン名&lt;/div&gt;&lt;div&gt;開始日時&lt;/div&gt;&lt;div&gt;終了日時&lt;/div&gt;&lt;div&gt;出発地（都道府県・エリア）&lt;font color=&quot;#ff3333&quot;&gt;[FK]&lt;/font&gt;&lt;/div&gt;&lt;div&gt;到着地（都道府県・エリア）&lt;font color=&quot;#ff3333&quot;&gt;[FK]&lt;/font&gt;&lt;/div&gt;&lt;div&gt;旅行のコンセプト &lt;font color=&quot;#ff3333&quot;&gt;[FK]&lt;/font&gt;&lt;/div&gt;&lt;div&gt;目的&lt;/div&gt;&lt;div&gt;ステータス（下書き、公開済み、完了済み）&lt;/div&gt;&lt;div&gt;子プランID&amp;nbsp;&lt;font color=&quot;#ff3333&quot;&gt;[FK]&lt;/font&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;ユーザーID&amp;nbsp;&lt;font color=&quot;#ff3333&quot;&gt;[FK]&lt;/font&gt;&lt;font color=&quot;#ff3333&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;プラン作成日時&lt;/div&gt;&lt;div&gt;プラン更新日時&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="50" width="260" height="300" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="&lt;h1&gt;子プラン&lt;/h1&gt;&lt;div&gt;&lt;div&gt;子プランID &lt;font color=&quot;#80ff00&quot;&gt;[PK]&lt;/font&gt;&lt;/div&gt;&lt;div&gt;親プランID&amp;nbsp;&lt;span style=&quot;color: rgb(255, 51, 51); background-color: initial;&quot;&gt;[FK]&lt;/span&gt;&lt;/div&gt;&lt;div&gt;order（子プランの表示順）&lt;/div&gt;&lt;div&gt;目的地名&lt;/div&gt;&lt;div&gt;チェックイン日時&lt;/div&gt;&lt;div&gt;チェックアウト日時&lt;/div&gt;&lt;div&gt;メモ&lt;/div&gt;&lt;div&gt;子プラン作成日時&lt;/div&gt;&lt;div&gt;子プラン更新日時&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="510" y="410" width="260" height="230" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="&lt;h1&gt;都道府県・エリア&lt;/h1&gt;&lt;div&gt;&lt;div&gt;エリアID&amp;nbsp;&lt;span style=&quot;color: rgb(128, 255, 0); background-color: initial;&quot;&gt;[PK]&lt;/span&gt;&lt;/div&gt;&lt;div&gt;都道府県&lt;/div&gt;&lt;div&gt;エリア名&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="10" y="140" width="240" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="&lt;h1&gt;旅行のコンセプト&lt;/h1&gt;&lt;div&gt;&lt;div&gt;コンセプトID&amp;nbsp;&lt;span style=&quot;color: rgb(128, 255, 0); background-color: initial;&quot;&gt;[PK]&lt;/span&gt;&lt;/div&gt;&lt;div&gt;コンセプト名&lt;/div&gt;&lt;/div&gt;&lt;div&gt;コンセプト作成日時&lt;/div&gt;&lt;div&gt;コンセプト更新日時&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="620" y="140" width="200" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="&lt;h1&gt;ユーザー&lt;/h1&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;ユーザーID &lt;font color=&quot;#80ff00&quot;&gt;[PK]&lt;/font&gt;&lt;/div&gt;&lt;div&gt;ユーザー名&lt;/div&gt;&lt;div&gt;メールアドレス&lt;/div&gt;&lt;div&gt;パスワード&lt;/div&gt;&lt;div&gt;プロフィール画像URL&lt;/div&gt;&lt;div&gt;連続ログイン試行回数&lt;/div&gt;&lt;div&gt;最終ログイン日&lt;/div&gt;&lt;div&gt;is_google_account（グーグルアカウントかどうか）&lt;/div&gt;&lt;div&gt;ユーザー情報作成日時&lt;/div&gt;&lt;div&gt;ユーザー情報更新日時&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="410" width="260" height="230" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="" style="line;strokeWidth=2;html=1;fontColor=#80FF00;" parent="1" vertex="1">
+                    <mxGeometry x="250" y="210" width="50" height="10" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="" style="line;strokeWidth=2;html=1;fontColor=#80FF00;" parent="1" vertex="1">
+                    <mxGeometry x="560" y="210" width="60" height="10" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="1" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#80FF00;" parent="1" vertex="1">
+                    <mxGeometry x="260" y="180" width="10" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="1" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#80FF00;" parent="1" vertex="1">
+                    <mxGeometry x="280" y="180" width="10" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="1" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#80FF00;" parent="1" vertex="1">
+                    <mxGeometry x="570" y="180" width="10" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="1" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#80FF00;" parent="1" vertex="1">
+                    <mxGeometry x="600" y="180" width="10" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="1" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#80FF00;" parent="1" vertex="1">
+                    <mxGeometry x="180" y="380" width="10" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="" style="shape=partialRectangle;whiteSpace=wrap;html=1;bottom=0;right=0;fillColor=none;fontColor=#80FF00;" parent="1" vertex="1">
+                    <mxGeometry x="205" y="320" width="95" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="" style="shape=partialRectangle;whiteSpace=wrap;html=1;bottom=0;right=0;fillColor=none;fontColor=#80FF00;direction=north;rotation=-180;" parent="1" vertex="1">
+                    <mxGeometry x="560" y="320" width="90" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="n&lt;br&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#80FF00;" parent="1" vertex="1">
+                    <mxGeometry x="280" y="290" width="10" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="1" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#80FF00;" parent="1" vertex="1">
+                    <mxGeometry x="570" y="290" width="10" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="n&lt;br&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#80FF00;" parent="1" vertex="1">
+                    <mxGeometry x="660" y="380" width="10" height="30" as="geometry"/>
+                </mxCell>
+                <UserObject label="&lt;h1&gt;ER図&lt;/h1&gt;" treeRoot="1" id="29">
+                    <mxCell style="whiteSpace=wrap;html=1;align=center;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontColor=#ffffff;fillColor=#a0522d;strokeColor=#6D1F00;" parent="1" vertex="1" collapsed="1">
+                        <mxGeometry x="20" y="10" width="120" height="60" as="geometry"/>
+                    </mxCell>
+                </UserObject>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

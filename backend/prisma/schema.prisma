@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 課題：varcharの文字数を再検討（全テーブル共通）
+// ParentPlanとAreaは双方向リレーション
+
+model User {
+  userId            String    @id @default(cuid()) @map("user_id")
+  name              String    @db.VarChar(50)
+  email             String    @unique @db.VarChar(255)
+  password          String    @db.VarChar(255)
+  profileThumbnail  Bytes?    @map("profile_thumbnail") // AWS S3に保存してURL参照するパターンも検討。その場合String型
+  loginAttempts     Int       @default(0) @map("login_attempts")
+  lastLoginAt       DateTime? @map("last_login_at")
+  isGoogleAccount   Boolean   @default(false) @map("is_google_account")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  @@map("user")
+}
+
+model Prefecture {
+  prefectureId      String    @id @map("prefecture_id")
+  prefectureName    String    @unique @db.VarChar(10) @map("prefecture_name")
+  areas             Area[]
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  @@map("prefecture")
+}
+
+model Area {
+  areaId              String        @id @map("area_id")
+  areaName            String        @map("area_name")
+  prefectureId        String        @map("prefecture_id")
+  prefecture          Prefecture    @relation(fields: [prefectureId], references: [prefectureId])
+  parentPlansAsStart  ParentPlan[]  @relation("startArea")
+  parentPlansAsEnd    ParentPlan[]  @relation("endArea")
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+  @@unique([prefectureId, areaName])
+  @@map("area")
+}
+
+model Concept {
+  conceptId    String       @id  @map("concept_id")
+  conceptName  String       @unique @map("concept_name")
+  parentPlans  ParentPlan[]
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  @@map("concept")
+}
+
+
+model ParentPlan {
+  parentPlanId    String     @id @default(cuid()) @map("parent_plan_id")
+  startAreaId     String     @map("start_area_id")
+  endAreaId       String     @map("end_area_id")
+  conceptId       String     @map("concept_id")
+  planName        String     @db.VarChar(255) @map("plan_name")
+  planThumbnail   Bytes?     @map("plan_thumbnail")
+  startDateTime   DateTime   @map("start_date_time")
+  endDateTime     DateTime   @map("end_date_time")
+  purpose         String?    @db.VarChar(255)
+  status          PlanStatus @default(Draft)
+
+  // 1つのAreaのareaIdを参照し、それをParentPlanの中でstartAreaId, endAreaIdとして使用
+  startArea       Area       @relation("startArea", fields: [startAreaId], references: [areaId]) 
+  endArea         Area       @relation("endArea", fields: [endAreaId], references: [areaId]) 
+  concept         Concept    @relation(fields: [conceptId], references: [conceptId])
+  childPlans      ChildPlan[]
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+  @@map("parent_plan")
+}
+
+
+model ChildPlan {
+  childPlanId    String       @id @default(cuid()) @map("child_plan_id")
+  parentPlanId   String       @map("parent_plan_id")
+  order          Int
+  locationName   String       @map("location_name")
+  checkInTime    DateTime?    @map("check_in_time")// 下書き時点では必須項目ではないためnullを許容
+  checkOutTime   DateTime?    @map("check_out_time")// 下書き時点では必須項目ではないためnullを許容
+  memo           String?      @db.Text
+  parentPlan     ParentPlan   @relation(fields: [parentPlanId], references: [parentPlanId])
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  @@map("child_plan")
+}
+
+enum PlanStatus {
+  Draft
+  Published
+  Completed
+}
