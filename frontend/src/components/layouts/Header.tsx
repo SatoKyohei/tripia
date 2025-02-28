@@ -18,8 +18,7 @@ import Logo from "@/components/elements/Logo/Logo";
 // 課題：画面上部固定になってないかも
 
 const pages = [
-    { name: "ホーム", path: "/" },
-    { name: "人気のプラン", path: "#" },
+    { name: "My Plans", path: "/plans" },
 ];
 const settings = [
     { name: "Dashboad", path: "mypage" },

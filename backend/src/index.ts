@@ -9,18 +9,18 @@ import { RegisterRoutes } from "../build/routes";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import { ValidateError } from "tsoa";
+import cookieParser from "cookie-parser";
 
 const app = express();
-
-export const tokenBlackList: Set<string> = new Set();
 
 app.get("/", (req, res) => {
     res.status(200).json({ message: "health check OK" });
 });
 
-app.use(cors({ origin: process.env.FRONTEND_URL }));
 app.use(urlencoded({ extended: true }));
 app.use(json());
+app.use(cookieParser());
+app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 
 app.use("/docs", swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
     const swaggerDocument = await import("../build/swagger.json");

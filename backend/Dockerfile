@@ -10,6 +10,4 @@ COPY . .
 
 EXPOSE 8080
 
-ENV PGCLIENTENCODING=UTF8
-
 CMD ["npm", "run", "dev"]

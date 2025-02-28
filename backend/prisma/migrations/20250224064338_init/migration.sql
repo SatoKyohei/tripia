@@ -51,6 +51,7 @@ CREATE TABLE "concept" (
 -- CreateTable
 CREATE TABLE "parent_plan" (
     "parent_plan_id" TEXT NOT NULL,
+    "author_id" TEXT NOT NULL,
     "start_area_id" TEXT NOT NULL,
     "end_area_id" TEXT NOT NULL,
     "concept_id" TEXT NOT NULL,

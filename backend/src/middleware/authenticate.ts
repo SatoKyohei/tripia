@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { tokenBlackList } from "..";
 import { SECRET_KEY } from "../config";
 
 export interface AuthenticateRequest extends Request {
@@ -14,9 +13,9 @@ export const authenticateToken = (req: AuthenticateRequest, res: Response, next:
     if (!token) {
         return res.status(401).json({ error: "Access Token required" });
     }
-    if (tokenBlackList.has(token)) {
-        return res.status(403).json({ error: "Token is no longer valid" });
-    }
+    // if (tokenBlackList.has(token)) {
+    //     return res.status(403).json({ error: "Token is no longer valid" });
+    // }
 
     jwt.verify(token, SECRET_KEY, (err, user) => {
         if (err) {

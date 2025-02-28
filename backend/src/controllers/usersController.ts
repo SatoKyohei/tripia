@@ -1,15 +1,13 @@
 import { User } from "@prisma/client";
 import { prisma } from "../lib/PrismaClient";
 import { Body, Controller, Get, Path, Post, Response, Route } from "tsoa";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { SECRET_KEY } from "../config";
-import { tokenBlackList } from "..";
 import { ValidateErrorJSON } from "../types/types";
 
 type UserCreationParams = Pick<User, "name" | "email" | "password">;
 type LoginParams = Pick<User, "email" | "password">;
-
 
 @Route("users")
 export class UsersController extends Controller {
@@ -82,21 +80,22 @@ export class UsersController extends Controller {
         }
 
         const token = jwt.sign({ userId: user.userId }, SECRET_KEY, { expiresIn: "1h" });
+
+        // 課題：Secure;を入れた方が良いが、入れるとHTTPSじゃないと通信できなくなる。開発環境ではhttpだと思うので今は外している。
+        this.setHeader("Set-Cookie", `token=${token}; HttpOnly; SameSite=Strict; Path=/`);
+
         this.setStatus(200);
         return { token, userId: user.userId };
     }
 
     // ログアウト
     @Post("logout")
-    public async logoutUser(
-        @Body() requestBody: { token: string },
-    ): Promise<{ message?: string } | void> {
-        const { token } = requestBody;
-        if (token) {
-            tokenBlackList.add(token);
-            this.setStatus(200);
-            return;
-        }
+    public async logoutUser(): Promise<{ message?: string } | void> {
+        // 課題：Secure;を入れた方が良いが、入れるとHTTPSじゃないと通信できなくなる。開発環境ではhttpだと思うので今は外している。
+        this.setHeader(
+            "Set-Cookie",
+            `token=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0`,
+        );
         this.setStatus(400);
         return { message: "トークンが提供されていません" };
     }
