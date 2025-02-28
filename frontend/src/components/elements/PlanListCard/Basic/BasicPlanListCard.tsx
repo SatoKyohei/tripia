@@ -1,21 +1,17 @@
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
+import { ParentPlan } from "@/types/type";
 
-type BasicPlanListCardProps = {
-    id: number;
-    name: string;
-    content: string;
-};
 
-const BasicPlanListCard = ({ plan }: { plan: BasicPlanListCardProps }) => {
+const BasicPlanListCard = ({ plan }: { plan: ParentPlan }) => {
     return (
         <Card>
             <CardMedia sx={{ height: 145 }} image="https://picsum.photos/800" />
             <CardContent>
                 <Typography gutterBottom variant="h5" component="div">
-                    {plan.name}
+                    {plan.planName}
                 </Typography>
                 <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                    {plan.content}
+                    {plan.purpose}
                 </Typography>
             </CardContent>
         </Card>

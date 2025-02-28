@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -64,6 +65,7 @@ model Concept {
 
 model ParentPlan {
   parentPlanId    String     @id @default(cuid()) @map("parent_plan_id")
+  authorId        String     @map("author_id")
   startAreaId     String     @map("start_area_id")
   endAreaId       String     @map("end_area_id")
   conceptId       String     @map("concept_id")

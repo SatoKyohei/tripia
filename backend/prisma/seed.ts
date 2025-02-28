@@ -1,13 +1,28 @@
+import { PlanStatus } from "@prisma/client";
 import { prisma } from "../src/lib/PrismaClient";
+import bcrypt from "bcryptjs";
 
 async function main() {
     // User
-    const users = await prisma.user.createMany({
-        data: [
-            { email: "sato@example.com", name: "sato", password: "sato" },
-            { name: "tanaka", email: "tanaka@example.com", password: "tanaka" },
-        ],
+    const userData = [
+        { name: "sato", email: "sato@example.com", password: "sato" },
+        { name: "tanaka", email: "tanaka@example.com", password: "tanaka" },
+    ];
+
+    const hashedUsers = await Promise.all(
+        userData.map(async (user) => ({
+            ...user,
+            password: await bcrypt.hash(user.password, 10),
+        })),
+    );
+
+    await prisma.user.createMany({
+        data: hashedUsers,
         skipDuplicates: true,
+    });
+
+    const users = await prisma.user.findMany({
+        where: { email: { in: userData.map((user) => user.email) } },
     });
 
     // Prefecture
@@ -25,7 +40,7 @@ async function main() {
     });
 
     // Area
-    const areas = await prisma.area.createMany({
+    await prisma.area.createMany({
         data: [
             { areaId: "tokyo_toshinn", areaName: "都心3区", prefectureId: "tokyo" },
             { areaId: "tokyo_fukutoshinn", areaName: "副都心4区", prefectureId: "tokyo" },
@@ -60,7 +75,7 @@ async function main() {
     });
 
     // Concept
-    const concepts = await prisma.concept.createMany({
+    await prisma.concept.createMany({
         data: [
             { conceptId: "relax", conceptName: "リラックス" },
             { conceptId: "active", conceptName: "アクティブな旅行" },
@@ -72,48 +87,65 @@ async function main() {
     });
 
     // ParentPlan
-    const parentPlans = await prisma.parentPlan.createMany({
-        data: [
-            {
-                startAreaId: "tokyo_toshinn",
-                endAreaId: "gunnma_seimou",
-                conceptId: "relax",
-                planName: "群馬西毛エリアのリラックス温泉旅行",
-                startDateTime: "2025-02-28T09:00:00+09:00",
-                endDateTime: "2025-03-02T18:00:00+09:00",
-                purpose: "家族4人で温泉",
-                status: "Draft",
-            },
-            {
-                startAreaId: "tokyo_fukutoshinn",
-                endAreaId: "chiba_minamibousou",
-                conceptId: "active",
-                planName: "南房総グルメと鴨川シーワールド",
-                startDateTime: "2025-03-21T08:30:00+09:00",
-                endDateTime: "2025-03-23T20:00:00+09:00",
-                purpose: "友達と3人で行くアクティブな旅行",
-                status: "Published",
-            },
-            {
-                startAreaId: "kanagawa_yokohama",
-                endAreaId: "kanagawa_yokohama",
-                conceptId: "shoestringTrip",
-                planName: "地元横浜の一人観光名所巡り",
-                startDateTime: "2025-04-21T10:00:00+09:00",
-                endDateTime: "2025-04-21T18:00:00+09:00",
-                purpose: "なるべくお金をかけずに観光スポットを巡る",
-                status: "Published",
-            },
-            {
-                startAreaId: "saitama_toubu",
-                endAreaId: "ibaragi_kennou",
-                conceptId: "gourmet",
-                planName: "大洗で海鮮食べ放題ツアー",
-                startDateTime: "2025-06-21T10:30:00+09:00",
-                endDateTime: "2025-06-21T17:00:00+09:00",
-                status: "Published",
-            },
-        ],
+    const plans = [
+        {
+            email: "sato@example.com",
+            startAreaId: "tokyo_toshinn",
+            endAreaId: "gunnma_seimou",
+            conceptId: "relax",
+            planName: "群馬西毛エリアのリラックス温泉旅行",
+            startDateTime: "2025-02-28T09:00:00+09:00",
+            endDateTime: "2025-03-02T18:00:00+09:00",
+            purpose: "家族4人で温泉",
+            status: PlanStatus.Published,
+        },
+        {
+            email: "sato@example.com",
+            startAreaId: "tokyo_fukutoshinn",
+            endAreaId: "chiba_minamibousou",
+            conceptId: "active",
+            planName: "南房総グルメと鴨川シーワールド",
+            startDateTime: "2025-03-21T08:30:00+09:00",
+            endDateTime: "2025-03-23T20:00:00+09:00",
+            purpose: "友達と3人で行くアクティブな旅行",
+            status: PlanStatus.Draft,
+        },
+        {
+            email: "tanaka@example.com",
+            startAreaId: "kanagawa_yokohama",
+            endAreaId: "kanagawa_yokohama",
+            conceptId: "shoestringTrip",
+            planName: "地元横浜の一人観光名所巡り",
+            startDateTime: "2025-04-21T10:00:00+09:00",
+            endDateTime: "2025-04-21T18:00:00+09:00",
+            purpose: "なるべくお金をかけずに観光スポットを巡る",
+            status: PlanStatus.Published,
+        },
+        {
+            email: "tanaka@example.com",
+            startAreaId: "saitama_toubu",
+            endAreaId: "ibaragi_kennou",
+            conceptId: "gourmet",
+            planName: "大洗で海鮮食べ放題ツアー",
+            startDateTime: "2025-06-21T10:30:00+09:00",
+            endDateTime: "2025-06-21T17:00:00+09:00",
+            status: PlanStatus.Draft,
+        },
+    ];
+
+    const plansWithAuthorId = plans.map((plan) => {
+        const user = users.find((user) => user.email === plan.email);
+        if (!user) {
+            throw new Error(`User not found: ${plan.email}`);
+        }
+        return {
+            ...plan,
+            authorId: user.userId,
+        };
+    });
+
+    await prisma.parentPlan.createMany({
+        data: plansWithAuthorId.map(({ email, ...rest }) => rest),
         skipDuplicates: true,
     });
 

@@ -1,13 +1,20 @@
-import { ParentPlan, User } from "@prisma/client";
+import { ParentPlan, PlanStatus, User } from "@prisma/client";
 import { prisma } from "../lib/PrismaClient";
 import { Body, Controller, Get, Post, Request, Response, Route, Security } from "tsoa";
 import { ValidateErrorJSON } from "../types/types";
 import { AuthenticateRequest } from "../middleware/authenticate";
 
-type PlanCreationParams = Pick<
-    ParentPlan,
-    "planName" | "planThumbnail" | "startDateTime" | "endDateTime" | "purpose" | "status"
->;
+type PlanCreationParams = {
+    planName: string;
+    planThumbnail?: Uint8Array | null;
+    startDateTime: Date;
+    endDateTime: Date;
+    purpose: string;
+    status: PlanStatus;
+    startAreaId: string;
+    endAreaId: string;
+    conceptId: string;
+};
 
 type PlanUpdateParams = Pick<
     ParentPlan,
@@ -17,7 +24,7 @@ type PlanUpdateParams = Pick<
 type ParentPlanWithAuthor = ParentPlan & { author: User };
 
 @Route("plans")
-@Security("jwt")
+// @Security("jwt")
 export class PlanController extends Controller {
     @Response<ValidateErrorJSON>(500, "Internal Server Error")
     @Get()
@@ -39,8 +46,18 @@ export class PlanController extends Controller {
         @Request() request: AuthenticateRequest,
         @Body() requestBody: PlanCreationParams,
     ): Promise<{ message?: string } | void> {
-        const { planName, planThumbnail, startDateTime, endDateTime, purpose, status } =
-            requestBody;
+        const {
+            planName,
+            planThumbnail,
+            startDateTime,
+            endDateTime,
+            purpose,
+            status,
+            startAreaId,
+            endAreaId,
+            conceptId,
+        } = requestBody;
+        
         const authorId = request.user?.userId;
 
         if (authorId === undefined) {
@@ -55,33 +72,34 @@ export class PlanController extends Controller {
 
         await prisma.parentPlan.create({
             data: {
+                authorId,
                 planName,
                 planThumbnail,
                 startDateTime,
                 endDateTime,
                 purpose,
                 status,
+                startAreaId,
+                endAreaId,
+                conceptId,
             },
         });
         this.setStatus(201);
     }
 
-    @Response<ValidateErrorJSON>(400, "")
-    @Get("plans/{parentPlanId}")
-    public async getParentPlan(parentPlanId: string): Promise<ParentPlanWithAuthor | null> {
-        const parentPlan = await prisma.parentPlan.findUnique({
-            where: {
-                parentPlanId,
-            },
-            include: { author: true },
-        });
-        if (!parentPlan) {
-            this.setStatus(404);
-            return null;
-        }
-        return parentPlan;
-    }
-
-
-    
+    // @Response<ValidateErrorJSON>(400, "")
+    // @Get("plans/{parentPlanId}")
+    // public async getParentPlan(parentPlanId: string): Promise<ParentPlanWithAuthor | null> {
+    //     const parentPlan = await prisma.parentPlan.findUnique({
+    //         where: {
+    //             parentPlanId,
+    //         },
+    //         include: { author: true },
+    //     });
+    //     if (!parentPlan) {
+    //         this.setStatus(404);
+    //         return null;
+    //     }
+    //     return parentPlan;
+    // }
 }

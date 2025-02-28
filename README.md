@@ -39,14 +39,16 @@
     - npx tsc --init
     - mkdir src
     - touch src/index.ts
+    - npm i cookie-parser
+    - npm i -D @types/cookie-parser
   - ESLint
     - npm i -D eslint eslint-plugin-prettier eslint-config-prettier prettier eslint-plugin-import typescript-eslint
   - tsoa/SwaggerUI
     - npm i tsoa swagger-ui-express
     - npm i -D concurrently @types/swagger-ui-express
-  - 認証（JWT/bcrypt）
-    - npm i jsonwebtoken bcrypt
-    - npm i -D @types/jsonwebtoken @types/bcrypt
+  - 認証（JWT/bcryptjs）
+    - npm i jsonwebtoken bcryptjs
+    - npm i -D @types/jsonwebtoken @types/bcryptjs
   - リソース共有
     - npm i cors
     - npm i -D @types/cors
