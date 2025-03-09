@@ -1,7 +1,7 @@
 import BasicButton from "@/components/elements/Button/Basic/BasicButton";
 
-// 課題：実装次第ではプランIDはnumberじゃないかも
-const EditButton = ({ planId }: { planId: number }) => {
+
+const EditButton = ({ planId }: { planId: string }) => {
     return (
         <BasicButton
             buttonName="編集"

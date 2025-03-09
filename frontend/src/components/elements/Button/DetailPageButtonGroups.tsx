@@ -5,7 +5,7 @@ import EditButton from "@/components/elements/Button/EditButton";
 import DeleteButton from "@/components/elements/Button/DeleteButton";
 import DuplicateButton from "@/components/elements/Button/DuplicateButton";
 
-const DetailPageButtonGroups = ({ planId }: { planId: number }) => {
+const DetailPageButtonGroups = ({ planId }: { planId: string }) => {
     // 課題：プラン削除のPostリクエスト
     const handleDelete = () => {};
 

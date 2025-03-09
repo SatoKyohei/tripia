@@ -66,15 +66,15 @@ model Concept {
 model ParentPlan {
   parentPlanId    String     @id @default(cuid()) @map("parent_plan_id")
   authorId        String     @map("author_id")
-  startAreaId     String     @map("start_area_id")
-  endAreaId       String     @map("end_area_id")
-  conceptId       String     @map("concept_id")
   planName        String     @db.VarChar(255) @map("plan_name")
   planThumbnail   Bytes?     @map("plan_thumbnail")
   startDateTime   DateTime   @map("start_date_time")
   endDateTime     DateTime   @map("end_date_time")
   purpose         String?    @db.VarChar(255)
   status          PlanStatus @default(Draft)
+  startAreaId     String     @map("start_area_id")
+  endAreaId       String     @map("end_area_id")
+  conceptId       String     @map("concept_id")
 
   // 1つのAreaのareaIdを参照し、それをParentPlanの中でstartAreaId, endAreaIdとして使用
   startArea       Area       @relation("startArea", fields: [startAreaId], references: [areaId]) 

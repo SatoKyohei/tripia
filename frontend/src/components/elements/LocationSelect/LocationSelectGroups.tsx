@@ -27,16 +27,23 @@ const areas = [
     { id: 6, name: "横浜" },
 ];
 
-const LocationSelectGroups = () => {
+type LocationSelectGroupsProps = {
+    startPrefectureName?: string;
+    startAreaName?: string;
+    endPrefectureName?: string;
+    endAreaName?: string;
+};
+
+const LocationSelectGroups = (props: LocationSelectGroupsProps) => {
     return (
         <>
             <Stack direction="row" spacing={3}>
-                <BasicLocationSelect label={labels.departure} options={prefectures} />
-                <BasicLocationSelect label={labels.departureArea} options={areas} />
+                <BasicLocationSelect label={labels.departure} option={props.startPrefectureName} />
+                <BasicLocationSelect label={labels.departureArea} option={props.startAreaName} />
             </Stack>
             <Stack direction="row" spacing={3}>
-                <BasicLocationSelect label={labels.arrival} options={prefectures} />
-                <BasicLocationSelect label={labels.arrivalArea} options={areas} />
+                <BasicLocationSelect label={labels.arrival} option={props.endPrefectureName} />
+                <BasicLocationSelect label={labels.arrivalArea} option={props.endAreaName} />
             </Stack>
         </>
     );
