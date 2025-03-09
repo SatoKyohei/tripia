@@ -1,11 +1,12 @@
 import { Stack } from "@mui/material";
-import PrimaryDateTimePicker from "@/components/elements/DateTimePicker/Basic/BasicDateTimePicker";
+import BasicDateTimePicker from "@/components/elements/DateTimePicker/Basic/BasicDateTimePicker";
+import { DateTimePicker } from "@/types/type";
 
-const DateTimePickerGroups = () => {
+const DateTimePickerGroups = (props: DateTimePicker) => {
     return (
         <Stack direction="row" spacing={3}>
-            <PrimaryDateTimePicker label="開始日時" />
-            <PrimaryDateTimePicker label="終了日時" />
+            <BasicDateTimePicker label="開始日時" dateTime={props.startDateTime} />
+            <BasicDateTimePicker label="終了日時" dateTime={props.endDateTime}/>
         </Stack>
     );
 };
