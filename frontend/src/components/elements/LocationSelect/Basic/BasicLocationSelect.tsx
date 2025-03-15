@@ -6,26 +6,38 @@ import { useState } from "react";
 
 type BasicLocationSelectProps = {
     label: string;
-    option?: string;
+    location?: string;
+    options: string[];
 };
 
 const BasicLocationSelect = (props: BasicLocationSelectProps) => {
-    const [location, setLocation] = useState("default");
+    const [place, setPlace] = useState("default");
 
     const handleChange = (event: SelectChangeEvent) => {
-        setLocation(event.target.value as string);
+        setPlace(event.target.value as string);
     };
 
     return (
         <FormControl variant="filled">
             <InputLabel id="location">{props.label}</InputLabel>
             <Select
-                value={location}
+                value={place}
                 onChange={handleChange}
                 labelId="location"
                 sx={{ width: "200px" }}
             >
-                <MenuItem value="default">{props.option}</MenuItem>
+                {/* 課題：リロードするとここでエラー起きる。https://qiita.com/course_k/items/86686e7ccdac40c8d51b */}
+                {props.options.map((option) =>
+                    props.location === option ? (
+                        <MenuItem key={props.location} value="default">
+                            {props.location}
+                        </MenuItem>
+                    ) : (
+                        <MenuItem key={option} value={option}>
+                            {option}
+                        </MenuItem>
+                    ),
+                )}
             </Select>
         </FormControl>
     );
