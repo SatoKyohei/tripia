@@ -32,10 +32,21 @@ type ParentPlanReturn = {
     endPrefectureName: string;
 };
 
+type childPlan = {
+    childPlanId: string;
+    parentPlanId: string;
+    order: number;
+    locationName: string;
+    checkInTime: Date | null;
+    checkOutTime: Date | null;
+    memo: string | null;
+};
+
 type ParentPlanResponse = {
     parentPlan: ParentPlanReturn;
-    allAreaNames: string[]
-    allPrefectureNames: string[]
+    childPlans: childPlan[];
+    allAreaNames: string[];
+    allPrefectureNames: string[];
 };
 
 // type PlanUpdateParams = Pick<
@@ -49,7 +60,8 @@ type ParentPlanResponse = {
 // @Security("jwt")
 export class PlanController extends Controller {
     @Response<ValidateErrorJSON>(500, "Internal Server Error")
-    @Get() public async getAllParentPlans(): Promise<ParentPlan[] | { message: string }> {
+    @Get()
+    public async getAllParentPlans(): Promise<ParentPlan[] | { message: string }> {
         try {
             const parentPlans = await prisma.parentPlan.findMany();
             return parentPlans;
@@ -67,6 +79,12 @@ export class PlanController extends Controller {
     ): Promise<ParentPlanResponse | { message: string }> {
         try {
             const parentPlanData = await prisma.parentPlan.findUnique({
+                where: {
+                    parentPlanId,
+                },
+            });
+
+            const childPlans = await prisma.childPlan.findMany({
                 where: {
                     parentPlanId,
                 },
@@ -107,6 +125,7 @@ export class PlanController extends Controller {
 
             if (
                 !parentPlanData ||
+                !childPlans ||
                 !startArea ||
                 !endArea ||
                 !startPrefecture ||
@@ -140,8 +159,7 @@ export class PlanController extends Controller {
                 (prefecture) => prefecture.prefectureName,
             );
 
-            return { parentPlan, allAreaNames, allPrefectureNames };
-            
+            return { parentPlan, childPlans, allAreaNames, allPrefectureNames };
         } catch (error) {
             this.setStatus(500);
             console.error(error);

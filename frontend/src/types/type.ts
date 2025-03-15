@@ -1,3 +1,5 @@
+import ChildPlan from "@/components/layouts/ChildPlan";
+
 // テーブル
 type PlanStatus = "Draft" | "Published" | "Completed";
 
@@ -17,21 +19,20 @@ export type ParentPlan = {
     status: PlanStatus;
 };
 
-// export type ParentPlan = {
-//     parentPlanId: string;
-//     authorId: string;
-//     conceptId: string;
-//     planName: string;
-//     planThumbnail: string | null;
-//     startAreaId: string;
-//     endAreaId: string;
-//     startDateTime: string;
-//     endDateTime: string;
-//     purpose: string | null;
-//     status: PlanStatus;
-//     createdAt: string;
-//     updatedAt: string;
-// };
+export type ChildPlan = {
+    childPlanId: string;
+    parentPlanId: string;
+    order: number;
+    locationName: string;
+    checkInTime: string | null;
+    checkOutTime: string | null;
+    memo: string | null;
+};
+
+export type PlanWithChildren = {
+    parentPlan: ParentPlan | null;
+    childPlans: ChildPlan[] | null;
+}
 
 // コンポーネント
 export type DateTimePicker = {

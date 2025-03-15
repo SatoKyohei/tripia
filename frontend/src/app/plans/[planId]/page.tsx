@@ -3,13 +3,16 @@ import { Container } from "@mui/material";
 import { useEffect, useState, use } from "react";
 import DetailPageButtonGroups from "@/components/elements/Button/DetailPageButtonGroups";
 import PlanDetail from "@/components/layouts/PlanDetail";
-import { ParentPlan } from "@/types/type";
+import { ChildPlan, ParentPlan } from "@/types/type";
+import { useAreaContext } from "@/contexts/AreaContext";
 
 // 課題：ダミーの指定
 // 課題：DetailPageButtonGroups ⇨ EditButtonにpropsを受け渡している。冗長な気がする。
 
 const PlanDetailPage = ({ params }: { params: Promise<{ planId: string }> }) => {
-    const [plan, setPlan] = useState<ParentPlan | null>(null);
+    const [parentPlan, setParentPlan] = useState<ParentPlan | null>(null);
+    const [childPlans, setChildPlans] = useState<ChildPlan[] | null>(null);
+    const { setAreaNames, setPrefectureNames } = useAreaContext();
     const { planId } = use(params);
 
     useEffect(() => {
@@ -22,16 +25,17 @@ const PlanDetailPage = ({ params }: { params: Promise<{ planId: string }> }) => 
                 credentials: "include",
             });
             const data = await response.json();
-
-            setPlan(data.parentPlan);
+            setParentPlan(data.parentPlan);
+            setChildPlans(data.childPlans);
+            setAreaNames(data.allAreaNames);
+            setPrefectureNames(data.allPrefectureNames);
         };
         fetchData();
     }, [planId]);
 
-
     return (
         <Container sx={{ mt: 5 }}>
-            <PlanDetail plan={plan} />
+            <PlanDetail parentPlan={parentPlan} childPlans={childPlans} />
             <DetailPageButtonGroups planId={planId} />
         </Container>
     );
