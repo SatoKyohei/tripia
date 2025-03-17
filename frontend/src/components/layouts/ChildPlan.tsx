@@ -4,8 +4,13 @@ import { useState } from "react";
 import DateTimePickerGroups from "@/components/elements/DateTimePicker/DateTimePickerGroups";
 import CountUpIconButton from "@/components/elements/IconButton/CountUpIconButton";
 import ChildPlanButtonGroups from "@/components/elements/Button/ChildPlanButtonGroups";
+import type { ChildPlan } from "@/types/type";
 
-const ChildPlan = () => {
+type ChildPlanProps = {
+    childPlans: ChildPlan[] | null;
+};
+
+const ChildPlan = (props: ChildPlanProps) => {
     // 課題：このusestateとhandleCountUp, handleCountDownは/plans/create/page.tsxでも定義しているのでリファクタリング。でもこっちのhandleCountDownは0個も可能だからそこをどうするか。
     // 課題：削除ボタンを押すと、その削除ボタンの上の子プランではなく、一番下の子プランが消えてしまう
 
@@ -26,7 +31,7 @@ const ChildPlan = () => {
                     <TextField label="目的地" />
                     <DateTimePickerGroups />
                     <TextField label="メモ" />
-                    <ChildPlanButtonGroups onClick={handleCountDown}/>
+                    <ChildPlanButtonGroups onClick={handleCountDown} />
                 </Stack>
             ))}
 
