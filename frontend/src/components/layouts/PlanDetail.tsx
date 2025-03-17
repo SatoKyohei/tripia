@@ -29,7 +29,7 @@ const PlanDetail = ({ parentPlan, childPlans }: PlanWithChildren) => {
             <Typography color="primary" component="h2" variant="h5">
                 子プラン
             </Typography>
-            <ChildPlan />
+            <ChildPlan childPlans={childPlans}/>
         </Stack>
     );
 };
