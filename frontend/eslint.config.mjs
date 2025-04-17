@@ -37,7 +37,8 @@ const eslintConfig = [
         },
         rules: {
             "import/order": "error",
-            "no-unused-vars": "warn",
+            "no-unused-vars": "off",
+            "@typescript-eslint/no-unused-vars": "off",
             semi: ["error", "always"],
             "no-console": ["error", { allow: ["error"] }],
             "react/react-in-jsx-scope": "off",

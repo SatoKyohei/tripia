@@ -1,12 +1,12 @@
 import BasicButton from "@/components/elements/Button/Basic/BasicButton";
 
-const DuplicateButton = () => {
+const DuplicateButton = ({ onClick }: { onClick: () => void }) => {
     return (
         <BasicButton
             buttonName="複製"
             component="button"
-            href="/plans"
             variant="contained"
+            onClick={onClick}
             sx={{ backgroundColor: "#2196F3" }}
         />
     );
