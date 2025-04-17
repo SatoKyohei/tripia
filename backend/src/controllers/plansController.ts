@@ -1,39 +1,46 @@
-import { ParentPlan, PlanStatus, User } from "@prisma/client";
+import { PlanStatus } from "@prisma/client";
 import { prisma } from "../lib/PrismaClient";
-import { Body, Controller, Get, Post, Request, Response, Route, Security } from "tsoa";
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Path,
+    Post,
+    Put,
+    Request,
+    Response,
+    Route,
+    Security,
+} from "tsoa";
 import { ValidateErrorJSON } from "../types/types";
 import { AuthenticateRequest } from "../middleware/authenticate";
+import { childPlanService } from "../services/planService";
 
-type ParentPlanParams = {
-    planName: string;
-    planThumbnail?: Uint8Array | null;
-    startDateTime: Date;
-    endDateTime: Date;
-    purpose: string;
-    status: PlanStatus;
-    startAreaId: string;
-    endAreaId: string;
-    conceptId: string;
-};
-
-type ParentPlanReturn = {
+type ParentPlan = {
     parentPlanId: string;
     authorId: string;
-    conceptName: string;
     planName: string;
     planThumbnail: Uint8Array | null;
     startDateTime: Date;
     endDateTime: Date;
     purpose: string | null;
     status: PlanStatus;
+    startAreaId: string;
+    endAreaId: string;
+    conceptId: string;
+};
+
+type OtherPropertyOfParentPlan = {
     startAreaName: string;
     startPrefectureName: string;
     endAreaName: string;
     endPrefectureName: string;
+    conceptName: string;
 };
 
-type childPlan = {
-    childPlanId: string;
+type ChildPlan = {
+    childPlanId?: string;
     parentPlanId: string;
     order: number;
     locationName: string;
@@ -42,19 +49,52 @@ type childPlan = {
     memo: string | null;
 };
 
-type ParentPlanResponse = {
-    parentPlan: ParentPlanReturn;
-    childPlans: childPlan[];
+type ParentAndChildPlan = {
+    parentPlan: ParentPlan & OtherPropertyOfParentPlan;
+    childPlans: ChildPlan[];
+};
+
+type AllAreaAndPrefectureNames = {
     allAreaNames: string[];
     allPrefectureNames: string[];
 };
 
-// type PlanUpdateParams = Pick<
-//     ParentPlan,
-//     "planName" | "planThumbnail" | "startDateTime" | "endDateTime" | "purpose" | "status"
-// >;
+@Route("metadata")
+export class MetaDataController extends Controller {
+    @Response<ValidateErrorJSON>(500, "Internal Server Error")
+    @Get("location")
+    public async getAllAreaNames(): Promise<
+        { message?: string } | AllAreaAndPrefectureNames | void
+    > {
+        try {
+            const allArea = await prisma.area.findMany({
+                select: {
+                    areaName: true,
+                },
+            });
 
-// type ParentPlanWithAuthor = ParentPlanParams & { author: User };
+            const allPrefecture = await prisma.prefecture.findMany({
+                select: {
+                    prefectureName: true,
+                },
+            });
+
+            if (!allArea || !allPrefecture) {
+                this.setStatus(404);
+                return { message: "Failed to retrieve location" };
+            }
+
+            const allAreaNames = allArea.map((area) => area.areaName);
+            const allPrefectureNames = allPrefecture.map((prefecture) => prefecture.prefectureName);
+
+            this.setStatus(200);
+            return { allAreaNames, allPrefectureNames };
+        } catch (error) {
+            this.setStatus(500);
+            return { message: "Failed to retrieve location" };
+        }
+    }
+}
 
 @Route("plans")
 // @Security("jwt")
@@ -76,7 +116,7 @@ export class PlanController extends Controller {
     @Get("{parentPlanId}")
     public async getParentPlan(
         parentPlanId: string,
-    ): Promise<ParentPlanResponse | { message: string }> {
+    ): Promise<ParentAndChildPlan | { message: string }> {
         try {
             const parentPlanData = await prisma.parentPlan.findUnique({
                 where: {
@@ -84,15 +124,25 @@ export class PlanController extends Controller {
                 },
             });
 
+            if (
+                !parentPlanData?.startAreaId ||
+                !parentPlanData?.endAreaId ||
+                !parentPlanData?.conceptId
+            ) {
+                this.setStatus(404);
+                return { message: "Missing required IDs in parent plan" };
+            }
+
             const childPlans = await prisma.childPlan.findMany({
                 where: {
                     parentPlanId,
                 },
+                orderBy: { order: "asc" },
             });
 
             const startArea = await prisma.area.findUnique({
                 where: {
-                    areaId: parentPlanData?.startAreaId,
+                    areaId: parentPlanData.startAreaId,
                 },
             });
 
@@ -104,7 +154,7 @@ export class PlanController extends Controller {
 
             const endArea = await prisma.area.findUnique({
                 where: {
-                    areaId: parentPlanData?.endAreaId,
+                    areaId: parentPlanData.endAreaId,
                 },
             });
 
@@ -120,9 +170,6 @@ export class PlanController extends Controller {
                 },
             });
 
-            const allAreas = await prisma.area.findMany();
-            const allPrefectures = await prisma.prefecture.findMany();
-
             if (
                 !parentPlanData ||
                 !childPlans ||
@@ -130,9 +177,7 @@ export class PlanController extends Controller {
                 !endArea ||
                 !startPrefecture ||
                 !endPrefecture ||
-                !concept ||
-                !allAreas ||
-                !allPrefectures
+                !concept
             ) {
                 this.setStatus(404);
                 return { message: "Failed to retrieve plans" };
@@ -148,18 +193,16 @@ export class PlanController extends Controller {
                 purpose: parentPlanData?.purpose,
                 status: parentPlanData?.status,
                 conceptName: concept?.conceptName,
+                conceptId: parentPlanData?.conceptId,
+                startAreaId: parentPlanData?.startAreaId,
                 startAreaName: startArea?.areaName,
                 startPrefectureName: startPrefecture?.prefectureName,
+                endAreaId: parentPlanData?.endAreaId,
                 endAreaName: endArea?.areaName,
                 endPrefectureName: endPrefecture?.prefectureName,
             };
 
-            const allAreaNames = allAreas.map((area) => area.areaName);
-            const allPrefectureNames = allPrefectures.map(
-                (prefecture) => prefecture.prefectureName,
-            );
-
-            return { parentPlan, childPlans, allAreaNames, allPrefectureNames };
+            return { parentPlan, childPlans };
         } catch (error) {
             this.setStatus(500);
             console.error(error);
@@ -169,10 +212,10 @@ export class PlanController extends Controller {
 
     @Response<ValidateErrorJSON>(400, "Invalid requests")
     @Response<ValidateErrorJSON>(401, "Unauthorized")
-    @Post()
+    @Post("create")
     public async createParentPlan(
         @Request() request: AuthenticateRequest,
-        @Body() requestBody: ParentPlanParams,
+        @Body() requestBody: Omit<ParentPlan, "parentPlanId" | "authorId">,
     ): Promise<{ message?: string } | void> {
         const {
             planName,
@@ -213,5 +256,234 @@ export class PlanController extends Controller {
             },
         });
         this.setStatus(201);
+    }
+
+    @Response<ValidateErrorJSON>(400, "Invalid requests")
+    @Response<ValidateErrorJSON>(401, "Unauthorized")
+    @Put("update")
+    public async updateParentPlan(
+        @Request() request: AuthenticateRequest,
+        @Body() requestBody: any,
+    ): Promise<{ message?: string } | void> {
+
+        const {
+            authorId,
+            parentPlanId,
+            planName,
+            planThumbnail,
+            startDateTime,
+            endDateTime,
+            purpose,
+            status,
+            startAreaId,
+            endAreaId,
+            conceptId,
+        } = requestBody;
+
+        await prisma.parentPlan.update({
+            where: { parentPlanId },
+            data: {
+                authorId,
+                planName,
+                planThumbnail,
+                startDateTime,
+                endDateTime: new Date(endDateTime),
+                purpose,
+                status,
+                startAreaId,
+                endAreaId,
+                conceptId,
+            },
+        });
+        this.setStatus(201);
+    }
+
+    @Response<ValidateErrorJSON>(400, "Invalid requests")
+    @Response<ValidateErrorJSON>(401, "Unauthorized")
+    @Delete("{parentPlanId}/delete")
+    public async deleteParentPlan(
+        @Request() request: AuthenticateRequest,
+        parentPlanId: string,
+    ): Promise<{ message?: string } | void> {
+        try {
+            const ids = await prisma.childPlan.findMany({
+                where: {
+                    parentPlanId,
+                },
+                select: {
+                    childPlanId: true,
+                },
+            });
+
+            const childPlanIds = ids.map((id) => id.childPlanId);
+
+            await prisma.childPlan.deleteMany({
+                where: {
+                    childPlanId: {
+                        in: childPlanIds,
+                    },
+                },
+            });
+
+            await prisma.parentPlan.delete({ where: { parentPlanId } });
+        } catch (error) {
+            this.setStatus(500);
+            console.error(error);
+            return { message: "Failed to delete plan" };
+        }
+    }
+
+    @Response<ValidateErrorJSON>(400, "Invalid requests")
+    @Response<ValidateErrorJSON>(401, "Unauthorized")
+    @Post("duplicate")
+    public async duplicateParentPlan(
+        @Request() request: AuthenticateRequest,
+        @Body() requestBody: { parentPlanId: string },
+    ): Promise<{ message?: string }> {
+        try {
+            const { parentPlanId } = requestBody;
+            const newParentPlan =
+                await childPlanService.duplicateChildPlanToAnotherParentPlan(parentPlanId);
+            return { message: "Successfully duplicated Parent plan" };
+        } catch (error) {
+            this.setStatus(500);
+            console.error(error);
+            return { message: "Failed to duplicate ParentPlan" };
+        }
+    }
+}
+
+@Route("child-plans")
+// 課題：createをupdateと一緒にしているが、やっぱわける
+// @Security("jwt")
+export class ChildrenPlanController extends Controller {
+    @Response<ValidateErrorJSON>(400, "Invalid Requests")
+    @Response<ValidateErrorJSON>(401, "Unauthorized")
+    @Post("create")
+    public async createChildPlan(
+        @Request() request: AuthenticateRequest,
+        @Body() requestBody: ChildPlan,
+    ): Promise<{ message?: string } | { message?: string; newChildPlan: ChildPlan } | void> {
+        try {
+            const { parentPlanId, order, locationName, checkInTime, checkOutTime, memo } =
+                requestBody;
+
+            const response = await prisma.childPlan.create({
+                data: {
+                    parentPlanId,
+                    order,
+                    locationName,
+                    checkInTime,
+                    checkOutTime,
+                    memo,
+                },
+            });
+
+            const { createdAt, updatedAt, ...newChildPlan } = response;
+
+            this.setStatus(200);
+            return { message: "Successfully created child plan", newChildPlan };
+        } catch (error) {
+            this.setStatus(500);
+            console.error(error);
+            return { message: "Failed to create plans" };
+        }
+    }
+
+    @Response<ValidateErrorJSON>(400, "Invalid Requests")
+    @Response<ValidateErrorJSON>(401, "Unauthorized")
+    @Put("update")
+    public async updateChildPlan(
+        @Request() request: AuthenticateRequest,
+        @Body() requestBody: ChildPlan,
+    ): Promise<{ message?: string } | void> {
+        try {
+            const { childPlanId, order, locationName, checkInTime, checkOutTime, memo } =
+                requestBody;
+
+            await prisma.childPlan.update({
+                where: {
+                    childPlanId,
+                },
+                data: {
+                    order,
+                    locationName,
+                    checkInTime,
+                    checkOutTime,
+                    memo,
+                },
+            });
+
+            this.setStatus(200);
+            return { message: "Successfully updated child plan" };
+        } catch (error) {
+            this.setStatus(500);
+            console.error(error);
+            return { message: "Failed to update plans" };
+        }
+    }
+
+    @Response<ValidateErrorJSON>(400, "Invalid Requests")
+    @Response<ValidateErrorJSON>(401, "Unauthorized")
+    @Delete("{childPlanId}")
+    public async deleteChildPlan(
+        @Path() childPlanId: string,
+    ): Promise<
+        { message?: string } | { message?: string; remainingChildPlans: ChildPlan[] } | void
+    > {
+        try {
+            const childPlan = await prisma.childPlan.findUnique({
+                where: {
+                    childPlanId,
+                },
+            });
+
+            const parentPlanId = childPlan?.parentPlanId;
+
+            await prisma.childPlan.delete({
+                where: {
+                    childPlanId,
+                },
+            });
+
+            const remainingChildPlans = await prisma.childPlan.findMany({
+                where: {
+                    parentPlanId,
+                },
+                orderBy: { order: "asc" },
+            });
+
+            for (let i = 0; i < remainingChildPlans.length; i++) {
+                await prisma.childPlan.update({
+                    where: {
+                        childPlanId: remainingChildPlans[i].childPlanId,
+                    },
+                    data: { order: i + 1 },
+                });
+            }
+
+            return { message: "Successfully deleted child plans", remainingChildPlans };
+        } catch (error) {
+            this.setStatus(500);
+            console.error(error);
+            return { message: "Failed to retrieve plans" };
+        }
+    }
+
+    @Response<ValidateErrorJSON>(400, "Invalid Requests")
+    @Response<ValidateErrorJSON>(401, "Unauthorized")
+    @Post("{childPlanId}/duplicate")
+    public async duplicateChildPlan(
+        @Path() childPlanId: string,
+    ): Promise<{ message?: string } | { message?: string; newChildPlan: ChildPlan } | void> {
+        try {
+            const newChildPlan =
+                await childPlanService.duplicateChildPlanToSameParentPlan(childPlanId);
+            return { message: "Successfully duplicated child plans", newChildPlan };
+        } catch (error) {
+            this.setStatus(500);
+            console.error(error);
+            return { message: "Failed to duplicate child plan" };
+        }
     }
 }

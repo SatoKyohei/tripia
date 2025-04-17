@@ -5,14 +5,19 @@ import EditButton from "@/components/elements/Button/EditButton";
 import DeleteButton from "@/components/elements/Button/DeleteButton";
 import DuplicateButton from "@/components/elements/Button/DuplicateButton";
 
-const DetailPageButtonGroups = ({ planId }: { planId: string }) => {
-    // 課題：プラン削除のPostリクエスト
-    const handleDelete = () => {};
-
+const DetailPageButtonGroups = ({
+    planId,
+    handleDelete,
+    handleDuplicate,
+}: {
+    planId: string;
+    handleDelete: () => void;
+    handleDuplicate: () => void;
+}) => {
     return (
         <Stack direction="row" spacing={2}>
             <EditButton planId={planId} />
-            <DuplicateButton/>
+            <DuplicateButton onClick={handleDuplicate}/>
             <DeleteButton onClick={handleDelete} />
             <CancelButton />
         </Stack>

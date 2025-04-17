@@ -6,8 +6,11 @@ const BasicDateTimePicker = (props: DateTimePickerGroups) => {
     return (
         <MobileDateTimePicker
             label={props.label}
-            value={props.dateTime ? moment(props.dateTime) : null}
+            value={props.dateTime ? moment(props.dateTime).local() : null}
             format="YYYY/MM/DD HH:mm"
+            onChange={(dateTime) => {
+                props.onChange(dateTime?.toDate().toISOString());
+            }}
         />
     );
 };

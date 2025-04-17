@@ -13,7 +13,7 @@ const CountUpIconButton = (props: CountUpIconButtonProps) => {
 
     return (
         <>
-            <BasicIconButton onClick={handleCountUp}>
+            <BasicIconButton color="info" onClick={handleCountUp} size="medium">
                 <AddCircleOutlineIcon />
             </BasicIconButton>
         </>

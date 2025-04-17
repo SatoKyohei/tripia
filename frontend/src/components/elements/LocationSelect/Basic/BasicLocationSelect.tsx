@@ -3,6 +3,7 @@ import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@m
 import { useState } from "react";
 
 // 課題：selectのwidth
+// 課題：Prefectureに対して、そのPrefecture内に実在するエリアだけプルダウンに表示されるようにする。たとえば東京を選択していて、小田原エリアを選択できると変
 
 type BasicLocationSelectProps = {
     label: string;
