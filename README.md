@@ -103,16 +103,16 @@
 - ~~子プランをそのまま編集できるよう改修~~
 - ~~子プランの順番変更~~
 - 親プラン専用のhooksも作成
-  - 変更のPlanDetail.tsxやhooksを改修中。親プランの時間変更があとフロントだけうまくいってない。parentPlanWithAreaAndPrefectureをplanに差し替える必要があるのだが、今度は表示されなくなる。そのためにはhooks側でuseEffectした方が良いとAIが最後に言ってるので見る
-    - 削除
+    - ~~削除~~
       - ~~フロント（hooks）~~
       - ~~フロント（UI）~~
       - ~~バックエンド~~
-    - 複製
+    - ~~複製~~
       - ~~フロント（hooks）~~
       - ~~フロント（UI）~~
       - ~~バックエンド~~
     - 変更
+      - 変更のPlanDetail.tsxやhooksを改修中。親プランの時間変更があとフロントだけうまくいってない。parentPlanWithAreaAndPrefectureをplanに差し替える必要があるのだが、そうすると今度は表示されなくなる。そのためにはhooks側でuseEffectした方が良いとAIが最後に言ってるので見る
       - フロント（hooks）
       - フロント（UI）
       - ~~バックエンド~~

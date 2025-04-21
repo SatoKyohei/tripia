@@ -8,13 +8,13 @@ import type { ChildPlan } from "@/types/type";
 import { useChildPlans } from "@/hooks/useChildPlans";
 
 type ChildPlanProps = {
-    childPlans: ChildPlan[] | null;
-    parentPlanId: string;
+    childPlans?: ChildPlan[] | null;
+    parentPlanId?: string;
 };
 
 const ChildPlan = ({ parentPlanId, childPlans }: ChildPlanProps) => {
     const { plans, setPlans, handleCountUp, handleChange, handleDelete, handleDuplicate } =
-        useChildPlans(childPlans, parentPlanId);
+        useChildPlans({ childPlans, parentPlanId });
 
     useEffect(() => {
         if (childPlans) {

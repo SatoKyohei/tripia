@@ -5,7 +5,7 @@ import DraftButton from "@/components/elements/Button/DraftButton";
 
 const CreatePageButtonGroups = () => {
     return (
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={2} sx={{ m: 3 }}>
             <CreateButton />
             <DraftButton />
             <CancelButton />

@@ -8,16 +8,16 @@ import { useAreaContext } from "@/contexts/AreaContext";
 // 課題：ダミーの指定
 // 課題：DetailPageButtonGroups ⇨ EditButtonにpropsを受け渡している。冗長な気がする。
 
-const PlanDetailPage = ({ params }: { params: Promise<{ planId: string }> }) => {
+const PlanDetailPage = ({ params }: { params: Promise<{ parentPlanId: string }> }) => {
     const [parentPlan, setParentPlan] = useState<ParentPlanDetail | null>(null);
     const [childPlans, setChildPlans] = useState<ChildPlan[] | null>(null);
     const { setAreaNames, setPrefectureNames } = useAreaContext();
-    const { planId } = use(params);
+    const { parentPlanId } = use(params);
 
     useEffect(() => {
         const fetchData = async () => {
             const planResponse = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/plans/${planId}`,
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/plans/${parentPlanId}`,
                 {
                     method: "GET",
                     headers: {
@@ -48,7 +48,7 @@ const PlanDetailPage = ({ params }: { params: Promise<{ planId: string }> }) => 
         };
 
         fetchData();
-    }, [planId]);
+    }, [parentPlanId]);
 
     return (
         <Container sx={{ mt: 5 }}>

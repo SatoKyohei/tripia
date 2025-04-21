@@ -1,15 +1,15 @@
 import cuid from "cuid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ParentPlan } from "@/types/type";
 
 export const useParentPlan = (parentPlan: ParentPlan) => {
-    const [plan, setPlan] = useState<ParentPlan>(parentPlan ?? "");
+    const [plan, setPlan] = useState<ParentPlan>(parentPlan);
     const router = useRouter();
 
+
     const handleChange = async (parentPlanId: string, key: keyof ParentPlan, value: string) => {
-        const updatedPlan = { ...parentPlan, [key]: value };
-        const { createdAt, updatedAt, ...targetPlan } = updatedPlan;
+        const updatedPlan = { ...plan, [key]: value };
 
         await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/plans/update`, {
             method: "PUT",
@@ -17,7 +17,7 @@ export const useParentPlan = (parentPlan: ParentPlan) => {
                 "Content-Type": "application/json",
             },
             credentials: "include",
-            body: JSON.stringify(targetPlan),
+            body: JSON.stringify(updatedPlan),
         })
             .then((response) => {
                 return response;
@@ -57,7 +57,7 @@ export const useParentPlan = (parentPlan: ParentPlan) => {
                 "Content-Type": "application/json",
             },
             credentials: "include",
-            body: JSON.stringify({parentPlanId}),
+            body: JSON.stringify({ parentPlanId }),
         });
 
         if (response.ok) {
