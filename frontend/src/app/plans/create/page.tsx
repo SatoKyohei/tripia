@@ -4,7 +4,16 @@ import BackHandIcon from "@mui/icons-material/BackHand";
 import TabPanel from "@mui/lab/TabPanel";
 import TabList from "@mui/lab/TabList";
 import TabContext from "@mui/lab/TabContext";
-import { Box, Container, Stack, Tab, TextField, Typography } from "@mui/material";
+import {
+    Box,
+    Container,
+    FormControlLabel,
+    Stack,
+    Switch,
+    Tab,
+    TextField,
+    Typography,
+} from "@mui/material";
 import { useState } from "react";
 import ImageUploadButton from "@/components/elements/Button/ImageUploadButton";
 import DateTimePickerGroups from "@/components/elements/DateTimePicker/DateTimePickerGroups";
@@ -31,6 +40,7 @@ const concepts = [
 const CreatePlanPage = () => {
     const [value, setValue] = useState(0);
     const [count, setCount] = useState(1);
+    const [isAutoCreatePlan, setIsAutoCreatePlan] = useState<boolean>(true);
 
     const handleCountUp = () => {
         setCount((prev) => (prev < 50 ? prev + 1 : 50));
@@ -53,49 +63,31 @@ const CreatePlanPage = () => {
 
     return (
         <Container sx={{ mt: 5 }}>
-            <TabContext value={value}>
-                <TabList onChange={handleTabChange}>
-                    <Tab icon={<PrecisionManufacturingIcon />} label="自動作成" />
-                    <Tab icon={<BackHandIcon />} label="手動作成" />
-                </TabList>
-
-                {/* 自動作成 */}
-                <TabPanel value={0}>
-                    <Box component="form">
-                        <Stack spacing={3}>
-                            <ImageUploadButton />
-                            <TextField required label="プラン名" />
-                            <DateTimePickerGroups />
-                            <LocationSelectGroups />
-                            <BasicLocationSelect label={labels.concept} options={concepts} />
-                            <TextField label="目的地の数" value={count} onChange={handleOnChange} />
-                            <CountIconButtonGroups
-                                handleCountUp={handleCountUp}
-                                handleCountDown={handleCountDown}
+            <Box component="form" >
+                <Stack spacing={3}>
+                    <ImageUploadButton />
+                    <TextField required label="プラン名" />
+                    <DateTimePickerGroups />
+                    <LocationSelectGroups />
+                    <BasicLocationSelect label={labels.concept} options={concepts} />
+                    <TextField label="目的地の数" value={count} onChange={handleOnChange} />
+                    <CountIconButtonGroups
+                        handleCountUp={handleCountUp}
+                        handleCountDown={handleCountDown}
+                    />
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={isAutoCreatePlan}
+                                onChange={(e) => setIsAutoCreatePlan(e.target.checked)}
                             />
-                            <TextField label="目的" />
-                        </Stack>
-                    </Box>
-                </TabPanel>
-
-                {/* 手動作成 */}
-                <TabPanel value={1}>
-                    <Box component="form">
-                        <Stack spacing={3}>
-                            <ImageUploadButton />
-                            <TextField required label="プラン名" />
-                            <DateTimePickerGroups />
-                            <LocationSelectGroups />
-                            <BasicLocationSelect label={labels.concept} options={concepts} />
-                            <TextField label="目的" />
-                            <Typography color="primary" component="h2" variant="h5">
-                                子プラン
-                            </Typography>
-                            <ChildPlan />
-                        </Stack>
-                    </Box>
-                </TabPanel>
-            </TabContext>
+                        }
+                        label="プランを自動生成する"
+                    />
+                    <TextField label="目的" />
+                </Stack>
+                {isAutoCreatePlan ? <ChildPlan /> : ""}
+            </Box>
             <CreatePageButtonGroups />
         </Container>
     );

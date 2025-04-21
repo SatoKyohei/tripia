@@ -19,8 +19,8 @@ const PlanDetail = ({ parentPlanWithAreaAndPrefecture, childPlans }: PlanWithChi
         rest as ParentPlan,
     );
 
-
     if (!parentPlanWithAreaAndPrefecture) return null;
+    if (!plan) return null;
 
     return (
         <Stack spacing={3}>
@@ -28,21 +28,13 @@ const PlanDetail = ({ parentPlanWithAreaAndPrefecture, childPlans }: PlanWithChi
             {/* <Image src={parentPlan?.planThumbnail} alt="サムネイル"/> */}
             <TextField required defaultValue={parentPlanWithAreaAndPrefecture?.planName} />
             <DateTimePickerGroups
-                startDateTime={plan?.startDateTime}
-                endDateTime={plan?.endDateTime}
+                startDateTime={plan?.startDateTime ?? ""}
+                endDateTime={plan?.endDateTime ?? ""}
                 onStartDateTimeChange={(value) =>
-                    handleChange(
-                        plan.parentPlanId,
-                        "startDateTime",
-                        value ?? "",
-                    )
+                    handleChange(plan.parentPlanId, "startDateTime", value ?? "")
                 }
                 onEndDateTimeChange={(value) =>
-                    handleChange(
-                        plan.parentPlanId,
-                        "endDateTime",
-                        value ?? "",
-                    )
+                    handleChange(plan.parentPlanId, "endDateTime", value ?? "")
                 }
             />
             <LocationSelectGroups

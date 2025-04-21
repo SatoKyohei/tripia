@@ -2,14 +2,19 @@ import cuid from "cuid";
 import { useState } from "react";
 import { ChildPlan } from "@/types/type";
 
-export const useChildPlans = (childPlans: ChildPlan[] | null, parentPlanId: string) => {
+type ChildPlanProps = {
+    childPlans?: ChildPlan[] | null;
+    parentPlanId?: string;
+};
+
+export const useChildPlans = ({ parentPlanId, childPlans }: ChildPlanProps) => {
     const [plans, setPlans] = useState<ChildPlan[]>(childPlans ?? []);
 
     const handleCountUp = async () => {
         const tempId = cuid();
         const newTempPlan = {
             childPlanId: tempId,
-            parentPlanId,
+            parentPlanId: parentPlanId ?? "",
             order: plans.length + 1,
             locationName: "",
             checkInTime: null,
