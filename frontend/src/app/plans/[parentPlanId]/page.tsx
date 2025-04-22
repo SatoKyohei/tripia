@@ -13,7 +13,7 @@ const PlanDetailPage = ({ params }: { params: Promise<{ parentPlanId: string }> 
     const [childPlans, setChildPlans] = useState<ChildPlan[] | null>(null);
     const { setAreaNames, setPrefectureNames } = useAreaContext();
     const { parentPlanId } = use(params);
-
+    // http://localhost:3000/plans/cm7ioz25k00028zknkybn0c4t
     useEffect(() => {
         const fetchData = async () => {
             const planResponse = await fetch(

@@ -28,13 +28,13 @@ const PlanDetail = ({ parentPlanWithAreaAndPrefecture, childPlans }: PlanWithChi
             {/* <Image src={parentPlan?.planThumbnail} alt="サムネイル"/> */}
             <TextField required defaultValue={parentPlanWithAreaAndPrefecture?.planName} />
             <DateTimePickerGroups
-                startDateTime={plan?.startDateTime ?? ""}
-                endDateTime={plan?.endDateTime ?? ""}
+                startDateTime={parentPlanWithAreaAndPrefecture?.startDateTime ?? ""}
+                endDateTime={parentPlanWithAreaAndPrefecture?.endDateTime ?? ""}
                 onStartDateTimeChange={(value) =>
-                    handleChange(plan.parentPlanId, "startDateTime", value ?? "")
+                    handleChange(parentPlanWithAreaAndPrefecture.parentPlanId, "startDateTime", value ?? "")
                 }
                 onEndDateTimeChange={(value) =>
-                    handleChange(plan.parentPlanId, "endDateTime", value ?? "")
+                    handleChange(parentPlanWithAreaAndPrefecture.parentPlanId, "endDateTime", value ?? "")
                 }
             />
             <LocationSelectGroups
