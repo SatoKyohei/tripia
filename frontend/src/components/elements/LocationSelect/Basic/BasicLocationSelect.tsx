@@ -1,21 +1,29 @@
 "use client";
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Area, ParentPlan, Prefecture } from "@/types/type";
 
 // 課題：selectのwidth
 // 課題：Prefectureに対して、そのPrefecture内に実在するエリアだけプルダウンに表示されるようにする。たとえば東京を選択していて、小田原エリアを選択できると変
 
 type BasicLocationSelectProps = {
     label: string;
-    location?: string;
-    options: string[];
+    location: string | null | undefined;
+    options: Area[] | Prefecture[];
+    onChange: (value: string) => void;
 };
 
 const BasicLocationSelect = (props: BasicLocationSelectProps) => {
-    const [place, setPlace] = useState("default");
+    const [place, setPlace] = useState(props.location ?? "default");
+
+    useEffect(() => {
+        setPlace(props.location ?? "default");
+    }, [props.location]);
 
     const handleChange = (event: SelectChangeEvent) => {
-        setPlace(event.target.value as string);
+        const newValue = event.target.value as string;
+        setPlace(newValue);
+        props.onChange(newValue);
     };
 
     return (
@@ -27,18 +35,23 @@ const BasicLocationSelect = (props: BasicLocationSelectProps) => {
                 labelId="location"
                 sx={{ width: "200px" }}
             >
-                {/* 課題：リロードするとここでエラー起きる。https://qiita.com/course_k/items/86686e7ccdac40c8d51b */}
-                {props.options.map((option) =>
-                    props.location === option ? (
-                        <MenuItem key={props.location} value="default">
-                            {props.location}
-                        </MenuItem>
-                    ) : (
-                        <MenuItem key={option} value={option}>
-                            {option}
-                        </MenuItem>
-                    ),
+                {place === "default" && (
+                    <MenuItem key="default" value="default">
+                        {props.label}を選択してください
+                    </MenuItem>
                 )}
+
+                {props.options.map((option) => {
+                    const locationName =
+                        "prefectureName" in option ? option.prefectureName : option.areaName;
+                    const value = "areaId" in option ? option.areaId : option.prefectureId;
+
+                    return (
+                        <MenuItem key={value} value={value}>
+                            {locationName}
+                        </MenuItem>
+                    );
+                })}
             </Select>
         </FormControl>
     );

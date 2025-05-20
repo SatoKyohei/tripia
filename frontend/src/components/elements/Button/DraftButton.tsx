@@ -1,6 +1,6 @@
 import BasicButton from "@/components/elements/Button/Basic/BasicButton";
 
-const DraftButton = () => {
+const DraftButton = ({ handleClick }: { handleClick: () => void }) => {
     return (
         <BasicButton
             buttonName="下書き保存"
@@ -8,6 +8,7 @@ const DraftButton = () => {
             href="/plans"
             variant="contained"
             sx={{ backgroundColor: "#2196F3" }}
+            onClick={handleClick}
         />
     );
 };

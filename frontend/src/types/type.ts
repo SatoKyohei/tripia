@@ -1,5 +1,5 @@
 // テーブル
-type PlanStatus = "Draft" | "Published" | "Completed";
+export type PlanStatus = "Draft" | "Published";
 
 export type ParentPlan = {
     parentPlanId: string;
@@ -13,6 +13,10 @@ export type ParentPlan = {
     endDateTime: string;
     purpose: string | null;
     status: PlanStatus;
+    startPrefectureName?: string;
+    endPrefectureName?: string;
+    startAreaName?: string;
+    endAreaName?: string;
 };
 
 export type ParentPlanParams = {
@@ -41,7 +45,7 @@ export type ParentPlanDetail = {
     startAreaId: string;
     endAreaId: string;
     conceptId: string;
-    
+
     conceptName: string;
     startAreaName: string;
     endAreaName: string;
@@ -49,7 +53,7 @@ export type ParentPlanDetail = {
     endPrefectureName: string;
 };
 
-export type ChildPlan = {
+export type ChildPlanType = {
     childPlanId: string;
     parentPlanId: string;
     order: number;
@@ -61,7 +65,7 @@ export type ChildPlan = {
 
 export type PlanWithChildren = {
     parentPlanWithAreaAndPrefecture: ParentPlanDetail | null;
-    childPlans: ChildPlan[] | null;
+    childPlans: ChildPlanType[] | null;
 };
 
 // コンポーネント
@@ -77,4 +81,14 @@ export type DateTimePickerGroups = {
     label?: string;
     dateTime?: string | undefined | null;
     onChange: (value?: string) => void;
+};
+
+export type Area = {
+    areaId: string;
+    areaName: string;
+};
+
+export type Prefecture = {
+    prefectureId: string;
+    prefectureName: string;
 };

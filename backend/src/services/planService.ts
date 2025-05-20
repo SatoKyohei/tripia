@@ -4,7 +4,7 @@ import { prisma } from "../lib/PrismaClient";
 type ParentPlanParams = {
     parentPlanId: string;
     planName: string;
-    planThumbnail?: Uint8Array | null;
+    planThumbnail?: string | null;
     startDateTime: Date;
     endDateTime: Date;
     purpose: string | null;
