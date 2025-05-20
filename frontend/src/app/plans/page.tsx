@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import PlanListCards from "@/components/layouts/PlanListCards";
 import BasicFilter from "@/components/elements/Filter/Basic/BasicFilter";
 import BasicSort from "@/components/elements/Sort/Basic/BasicSort";
+import BasicButton from "@/components/elements/Button/Basic/BasicButton";
 
 const PlanListPage = () => {
     const [plans, setPlans] = useState([]);
@@ -29,6 +30,16 @@ const PlanListPage = () => {
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <BasicSort />
                 <BasicFilter />
+            </Box>
+            <Box>
+                <BasicButton
+                    buttonName="プランを作成する"
+                    color="success"
+                    component="button"
+                    href="/plans/create"
+                    sx={{ marginTop: 5 }}
+                    variant="contained"
+                />
             </Box>
             <Box sx={{ marginTop: 10 }}>
                 <PlanListCards plans={plans} />

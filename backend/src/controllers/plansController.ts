@@ -21,7 +21,7 @@ type ParentPlan = {
     parentPlanId: string;
     authorId: string;
     planName: string;
-    planThumbnail: Uint8Array | null;
+    planThumbnail: string | null;
     startDateTime: Date;
     endDateTime: Date;
     purpose: string | null;
@@ -29,14 +29,6 @@ type ParentPlan = {
     startAreaId: string;
     endAreaId: string;
     conceptId: string;
-};
-
-type OtherPropertyOfParentPlan = {
-    startAreaName: string;
-    startPrefectureName: string;
-    endAreaName: string;
-    endPrefectureName: string;
-    conceptName: string;
 };
 
 type ChildPlan = {
@@ -50,51 +42,9 @@ type ChildPlan = {
 };
 
 type ParentAndChildPlan = {
-    parentPlan: ParentPlan & OtherPropertyOfParentPlan;
+    parentPlan: ParentPlan;
     childPlans: ChildPlan[];
 };
-
-type AllAreaAndPrefectureNames = {
-    allAreaNames: string[];
-    allPrefectureNames: string[];
-};
-
-@Route("metadata")
-export class MetaDataController extends Controller {
-    @Response<ValidateErrorJSON>(500, "Internal Server Error")
-    @Get("location")
-    public async getAllAreaNames(): Promise<
-        { message?: string } | AllAreaAndPrefectureNames | void
-    > {
-        try {
-            const allArea = await prisma.area.findMany({
-                select: {
-                    areaName: true,
-                },
-            });
-
-            const allPrefecture = await prisma.prefecture.findMany({
-                select: {
-                    prefectureName: true,
-                },
-            });
-
-            if (!allArea || !allPrefecture) {
-                this.setStatus(404);
-                return { message: "Failed to retrieve location" };
-            }
-
-            const allAreaNames = allArea.map((area) => area.areaName);
-            const allPrefectureNames = allPrefecture.map((prefecture) => prefecture.prefectureName);
-
-            this.setStatus(200);
-            return { allAreaNames, allPrefectureNames };
-        } catch (error) {
-            this.setStatus(500);
-            return { message: "Failed to retrieve location" };
-        }
-    }
-}
 
 @Route("plans")
 // @Security("jwt")
@@ -118,20 +68,11 @@ export class PlanController extends Controller {
         parentPlanId: string,
     ): Promise<ParentAndChildPlan | { message: string }> {
         try {
-            const parentPlanData = await prisma.parentPlan.findUnique({
+            const parentPlan = await prisma.parentPlan.findUnique({
                 where: {
                     parentPlanId,
                 },
             });
-
-            if (
-                !parentPlanData?.startAreaId ||
-                !parentPlanData?.endAreaId ||
-                !parentPlanData?.conceptId
-            ) {
-                this.setStatus(404);
-                return { message: "Missing required IDs in parent plan" };
-            }
 
             const childPlans = await prisma.childPlan.findMany({
                 where: {
@@ -140,67 +81,10 @@ export class PlanController extends Controller {
                 orderBy: { order: "asc" },
             });
 
-            const startArea = await prisma.area.findUnique({
-                where: {
-                    areaId: parentPlanData.startAreaId,
-                },
-            });
-
-            const startPrefecture = await prisma.prefecture.findUnique({
-                where: {
-                    prefectureId: startArea?.prefectureId,
-                },
-            });
-
-            const endArea = await prisma.area.findUnique({
-                where: {
-                    areaId: parentPlanData.endAreaId,
-                },
-            });
-
-            const endPrefecture = await prisma.prefecture.findUnique({
-                where: {
-                    prefectureId: endArea?.prefectureId,
-                },
-            });
-
-            const concept = await prisma.concept.findUnique({
-                where: {
-                    conceptId: parentPlanData?.conceptId,
-                },
-            });
-
-            if (
-                !parentPlanData ||
-                !childPlans ||
-                !startArea ||
-                !endArea ||
-                !startPrefecture ||
-                !endPrefecture ||
-                !concept
-            ) {
+            if (!parentPlan || !childPlans) {
                 this.setStatus(404);
                 return { message: "Failed to retrieve plans" };
             }
-
-            const parentPlan = {
-                parentPlanId: parentPlanData?.parentPlanId,
-                authorId: parentPlanData?.authorId,
-                planName: parentPlanData?.planName,
-                planThumbnail: parentPlanData?.planThumbnail,
-                startDateTime: parentPlanData?.startDateTime,
-                endDateTime: parentPlanData?.endDateTime,
-                purpose: parentPlanData?.purpose,
-                status: parentPlanData?.status,
-                conceptName: concept?.conceptName,
-                conceptId: parentPlanData?.conceptId,
-                startAreaId: parentPlanData?.startAreaId,
-                startAreaName: startArea?.areaName,
-                startPrefectureName: startPrefecture?.prefectureName,
-                endAreaId: parentPlanData?.endAreaId,
-                endAreaName: endArea?.areaName,
-                endPrefectureName: endPrefecture?.prefectureName,
-            };
 
             return { parentPlan, childPlans };
         } catch (error) {
@@ -229,7 +113,9 @@ export class PlanController extends Controller {
             conceptId,
         } = requestBody;
 
-        const authorId = request.user?.userId;
+        // 課題：認証の実装ができておらず、ダミーのauthorIdを指定している
+        // const authorId = request.user?.userId;
+        const authorId = "dummy-user-id"
 
         if (authorId === undefined) {
             this.setStatus(401);
@@ -265,7 +151,6 @@ export class PlanController extends Controller {
         @Request() request: AuthenticateRequest,
         @Body() requestBody: any,
     ): Promise<{ message?: string } | void> {
-
         const {
             authorId,
             parentPlanId,

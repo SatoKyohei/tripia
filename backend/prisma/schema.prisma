@@ -67,7 +67,7 @@ model ParentPlan {
   parentPlanId    String     @id @default(cuid()) @map("parent_plan_id")
   authorId        String     @map("author_id")
   planName        String     @db.VarChar(255) @map("plan_name")
-  planThumbnail   Bytes?     @map("plan_thumbnail")
+  planThumbnail   String?     @map("plan_thumbnail")
   startDateTime   DateTime   @map("start_date_time")
   endDateTime     DateTime   @map("end_date_time")
   purpose         String?    @db.VarChar(255)
@@ -104,5 +104,6 @@ model ChildPlan {
 enum PlanStatus {
   Draft
   Published
-  Completed
 }
+
+//課題：TravelStatus（"Planned" | "Completed"）も作ると、まだ行ってないプランとこれから行くプランで検索の時やりやすくなる。

@@ -1,6 +1,8 @@
 import { Stack } from "@mui/material";
+import { useEffect, useState } from "react";
 import BasicLocationSelect from "@/components/elements/LocationSelect/Basic/BasicLocationSelect";
-import { useAreaContext } from "@/contexts/AreaContext";
+import { ParentPlan } from "@/types/type";
+import { areaList, prefectureList } from "@/data/locationMaster";
 
 // 課題：ラベルはここに定義で本当に良いのか
 const labels = {
@@ -10,58 +12,84 @@ const labels = {
     arrivalArea: "到着地（エリア）",
 };
 
-// 課題：ダミーデータ
-// const prefectures = [
-//     { id: 1, name: "東京" },
-//     { id: 2, name: "栃木" },
-//     { id: 3, name: "群馬" },
-//     { id: 4, name: "埼玉" },
-//     { id: 5, name: "千葉" },
-//     { id: 6, name: "神奈川" },
-// ];
-// const areas = [
-//     { id: 1, name: "新宿" },
-//     { id: 2, name: "宇都宮" },
-//     { id: 3, name: "前橋" },
-//     { id: 4, name: "大宮" },
-//     { id: 5, name: "舞浜" },
-//     { id: 6, name: "横浜" },
-// ];
-
 type LocationSelectGroupsProps = {
-    startPrefectureName?: string;
-    startAreaName?: string;
-    endPrefectureName?: string;
-    endAreaName?: string;
+    startPrefectureId?: string;
+    startAreaId?: string;
+    endPrefectureId?: string;
+    endAreaId?: string;
+    parentPlanId?: string;
+    handleChange?: (parentPlanId: string, key: keyof ParentPlan, value: string) => void;
+    onLocalChange?: (key: "startAreaId" | "endAreaId", value: string) => void;
 };
 
 const LocationSelectGroups = (props: LocationSelectGroupsProps) => {
-    const { areaNames, prefectureNames } = useAreaContext();
-    
+    const [startPrefectureId, setStartPrefectureId] = useState<string | null | undefined>(
+        props.startPrefectureId,
+    );
+    const [endPrefectureId, setEndPrefectureId] = useState<string | null | undefined>(
+        props.endPrefectureId,
+    );
+
+    const filterdStartAreaList = areaList.filter((area) => area.prefectureId === startPrefectureId);
+
+    const filterdEndAreaList = areaList.filter((area) => area.prefectureId === endPrefectureId);
+
+    useEffect(() => {
+        const selectedStartArea = areaList.find((area) => area.areaId === props.startAreaId);
+        if (selectedStartArea && selectedStartArea.prefectureId !== startPrefectureId) {
+            setStartPrefectureId(selectedStartArea.prefectureId);
+        }
+
+        const selectedEndArea = areaList.find((area) => area.areaId === props.endAreaId);
+        if (selectedEndArea && selectedEndArea.prefectureId !== endPrefectureId) {
+            setEndPrefectureId(selectedEndArea.prefectureId);
+        }
+    }, [props.startPrefectureId, props.endPrefectureId]);
+
     return (
         <>
             <Stack direction="row" spacing={3}>
                 <BasicLocationSelect
                     label={labels.departure}
-                    location={props.startPrefectureName}
-                    options={prefectureNames}
+                    location={startPrefectureId}
+                    options={prefectureList}
+                    onChange={(value) => {
+                        setStartPrefectureId(value);
+                    }}
                 />
                 <BasicLocationSelect
                     label={labels.departureArea}
-                    location={props.startAreaName}
-                    options={areaNames}
+                    location={props.startAreaId}
+                    options={filterdStartAreaList}
+                    onChange={(value) => {
+                        if (props.handleChange && props.parentPlanId) {
+                            props.handleChange(props.parentPlanId, "startAreaId", value);
+                        } else if (props.onLocalChange) {
+                            props.onLocalChange("startAreaId", value);
+                        }
+                    }}
                 />
             </Stack>
             <Stack direction="row" spacing={3}>
                 <BasicLocationSelect
                     label={labels.arrival}
-                    location={props.endPrefectureName}
-                    options={prefectureNames}
+                    location={endPrefectureId}
+                    options={prefectureList}
+                    onChange={(value) => {
+                        setEndPrefectureId(value);
+                    }}
                 />
                 <BasicLocationSelect
                     label={labels.arrivalArea}
-                    location={props.endAreaName}
-                    options={areaNames}
+                    location={props.endAreaId}
+                    options={filterdEndAreaList}
+                    onChange={(value) => {
+                        if (props.handleChange && props.parentPlanId) {
+                            props.handleChange(props.parentPlanId, "endAreaId", value);
+                        } else if (props.onLocalChange) {
+                            props.onLocalChange("endAreaId", value);
+                        }
+                    }}
                 />
             </Stack>
         </>

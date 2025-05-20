@@ -1,14 +1,14 @@
 import cuid from "cuid";
 import { useState } from "react";
-import { ChildPlan } from "@/types/type";
+import { ChildPlanType } from "@/types/type";
 
 type ChildPlanProps = {
-    childPlans?: ChildPlan[] | null;
+    childPlans?: ChildPlanType[] | null;
     parentPlanId?: string;
 };
 
 export const useChildPlans = ({ parentPlanId, childPlans }: ChildPlanProps) => {
-    const [plans, setPlans] = useState<ChildPlan[]>(childPlans ?? []);
+    const [plans, setPlans] = useState<ChildPlanType[]>(childPlans ?? []);
 
     const handleCountUp = async () => {
         const tempId = cuid();
@@ -17,8 +17,8 @@ export const useChildPlans = ({ parentPlanId, childPlans }: ChildPlanProps) => {
             parentPlanId: parentPlanId ?? "",
             order: plans.length + 1,
             locationName: "",
-            checkInTime: null,
-            checkOutTime: null,
+            checkInTime: new Date().toISOString(),
+            checkOutTime: new Date().toISOString(),
             memo: "",
         };
 
@@ -40,7 +40,7 @@ export const useChildPlans = ({ parentPlanId, childPlans }: ChildPlanProps) => {
         setPlans((prev) => prev.map((plan) => (plan.childPlanId === tempId ? newChildPlan : plan)));
     };
 
-    const handleChange = async (childPlanId: string, key: keyof ChildPlan, value: string) => {
+    const handleChange = async (childPlanId: string, key: keyof ChildPlanType, value: string) => {
         setPlans((prev) => {
             const updatedPlans = prev.map((plan) =>
                 plan.childPlanId === childPlanId ? { ...plan, [key]: value } : plan,

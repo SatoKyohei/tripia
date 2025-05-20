@@ -8,7 +8,7 @@ const BasicDateTimePicker = (props: DateTimePickerGroups) => {
             label={props.label}
             value={props.dateTime ? moment(props.dateTime).local() : null}
             format="YYYY/MM/DD HH:mm"
-            onChange={(dateTime) => {
+            onAccept={(dateTime) => {
                 props.onChange(dateTime?.toDate().toISOString());
             }}
         />

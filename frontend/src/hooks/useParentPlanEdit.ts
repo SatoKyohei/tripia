@@ -3,10 +3,15 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ParentPlan } from "@/types/type";
 
-export const useParentPlan = (parentPlan: ParentPlan) => {
+export const useParentPlanEdit = (parentPlan: ParentPlan) => {
     const [plan, setPlan] = useState<ParentPlan>(parentPlan);
     const router = useRouter();
 
+    useEffect(() => {
+        if (parentPlan) {
+            setPlan(parentPlan);
+        }
+    }, [parentPlan]);
 
     const handleChange = async (parentPlanId: string, key: keyof ParentPlan, value: string) => {
         const updatedPlan = { ...plan, [key]: value };

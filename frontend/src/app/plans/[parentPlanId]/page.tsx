@@ -2,18 +2,16 @@
 import { Container } from "@mui/material";
 import { useEffect, useState, use } from "react";
 import PlanDetail from "@/components/layouts/PlanDetail";
-import { ChildPlan, ParentPlanDetail } from "@/types/type";
-import { useAreaContext } from "@/contexts/AreaContext";
+import { ChildPlanType, ParentPlan } from "@/types/type";
 
 // 課題：ダミーの指定
 // 課題：DetailPageButtonGroups ⇨ EditButtonにpropsを受け渡している。冗長な気がする。
 
 const PlanDetailPage = ({ params }: { params: Promise<{ parentPlanId: string }> }) => {
-    const [parentPlan, setParentPlan] = useState<ParentPlanDetail | null>(null);
-    const [childPlans, setChildPlans] = useState<ChildPlan[] | null>(null);
-    const { setAreaNames, setPrefectureNames } = useAreaContext();
+    const [parentPlan, setParentPlan] = useState<ParentPlan>();
+    const [childPlans, setChildPlans] = useState<ChildPlanType[]>([]);
     const { parentPlanId } = use(params);
-    // http://localhost:3000/plans/cm7ioz25k00028zknkybn0c4t
+
     useEffect(() => {
         const fetchData = async () => {
             const planResponse = await fetch(
@@ -29,22 +27,6 @@ const PlanDetailPage = ({ params }: { params: Promise<{ parentPlanId: string }> 
             const planData = await planResponse.json();
             setParentPlan(planData.parentPlan);
             setChildPlans(planData.childPlans);
-
-            const locationResponse = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/metadata/location`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    credentials: "include",
-                },
-            );
-
-            const locationData = await locationResponse.json();
-            const { allAreaNames, allPrefectureNames } = locationData;
-            setAreaNames(allAreaNames);
-            setPrefectureNames(allPrefectureNames);
         };
 
         fetchData();
@@ -52,7 +34,7 @@ const PlanDetailPage = ({ params }: { params: Promise<{ parentPlanId: string }> 
 
     return (
         <Container sx={{ mt: 5 }}>
-            <PlanDetail parentPlanWithAreaAndPrefecture={parentPlan} childPlans={childPlans} />
+            {parentPlan && <PlanDetail parentPlan={parentPlan} childPlans={childPlans} />}
         </Container>
     );
 };
