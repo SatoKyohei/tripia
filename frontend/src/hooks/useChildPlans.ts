@@ -5,9 +5,16 @@ import { ChildPlanType } from "@/types/type";
 type ChildPlanProps = {
     childPlans?: ChildPlanType[] | null;
     parentPlanId?: string;
+    setChildPlans: React.Dispatch<React.SetStateAction<ChildPlanType[]>>;
+    autoSave?: boolean;
 };
 
-export const useChildPlans = ({ parentPlanId, childPlans }: ChildPlanProps) => {
+export const useChildPlans = ({
+    parentPlanId,
+    childPlans,
+    setChildPlans,
+    autoSave = true,
+}: ChildPlanProps) => {
     const [plans, setPlans] = useState<ChildPlanType[]>(childPlans ?? []);
 
     const handleCountUp = async () => {
@@ -23,6 +30,15 @@ export const useChildPlans = ({ parentPlanId, childPlans }: ChildPlanProps) => {
         };
 
         setPlans((prev) => [...prev, newTempPlan]);
+
+        if (!parentPlanId) {
+            return;
+        }
+        
+        if (setChildPlans) {
+            setChildPlans((prev) => [...prev, newTempPlan]); // ← 追加
+        }
+
         const { childPlanId, ...planDataForAPI } = newTempPlan;
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/create`, {
@@ -41,30 +57,32 @@ export const useChildPlans = ({ parentPlanId, childPlans }: ChildPlanProps) => {
     };
 
     const handleChange = async (childPlanId: string, key: keyof ChildPlanType, value: string) => {
-        setPlans((prev) => {
-            const updatedPlans = prev.map((plan) =>
-                plan.childPlanId === childPlanId ? { ...plan, [key]: value } : plan,
-            );
+        if (autoSave) {
+            setPlans((prev) => {
+                const updatedPlans = prev.map((plan) =>
+                    plan.childPlanId === childPlanId ? { ...plan, [key]: value } : plan,
+                );
 
-            const tempPlan = updatedPlans.find((plan) => plan.childPlanId === childPlanId);
-            const { createdAt, updatedAt, ...targetPlan } = tempPlan;
+                const tempPlan = updatedPlans.find((plan) => plan.childPlanId === childPlanId);
+                const { createdAt, updatedAt, ...targetPlan } = tempPlan;
 
-            fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/update`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(targetPlan),
-                credentials: "include",
-            }).then((response) => {
-                if (!response.ok) {
-                    console.error("Failed to save child plan");
-                    return;
-                }
+                fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/update`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(targetPlan),
+                    credentials: "include",
+                }).then((response) => {
+                    if (!response.ok) {
+                        console.error("Failed to save child plan");
+                        return;
+                    }
+                });
+
+                return updatedPlans;
             });
-
-            return updatedPlans;
-        });
+        }
     };
 
     const handleDelete = async (childPlanId: string) => {

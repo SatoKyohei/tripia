@@ -22,6 +22,8 @@ const PlanDetail = ({
         parentPlan as ParentPlan,
     );
 
+
+
     const startPrefectureId = getPrefectureIdByAreaId(plan.startAreaId);
     const endPrefectureId = getPrefectureIdByAreaId(plan.endAreaId);
 

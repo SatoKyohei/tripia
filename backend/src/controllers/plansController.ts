@@ -100,7 +100,7 @@ export class PlanController extends Controller {
     public async createParentPlan(
         @Request() request: AuthenticateRequest,
         @Body() requestBody: Omit<ParentPlan, "parentPlanId" | "authorId">,
-    ): Promise<{ message?: string } | void> {
+    ): Promise<{ message?: string } | { message?: string; parentPlanId: string } | void> {
         const {
             planName,
             planThumbnail,
@@ -115,7 +115,7 @@ export class PlanController extends Controller {
 
         // 課題：認証の実装ができておらず、ダミーのauthorIdを指定している
         // const authorId = request.user?.userId;
-        const authorId = "dummy-user-id"
+        const authorId = "dummy-user-id";
 
         if (authorId === undefined) {
             this.setStatus(401);
@@ -127,7 +127,7 @@ export class PlanController extends Controller {
             return { message: "プラン名はnullにできません" };
         }
 
-        await prisma.parentPlan.create({
+        const newParentPlan = await prisma.parentPlan.create({
             data: {
                 authorId,
                 planName,
@@ -142,6 +142,7 @@ export class PlanController extends Controller {
             },
         });
         this.setStatus(201);
+        return { message: "親プランを作成しました", parentPlanId: newParentPlan.parentPlanId };
     }
 
     @Response<ValidateErrorJSON>(400, "Invalid requests")

@@ -10,18 +10,18 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import cuid from "cuid";
 import ImageUploadButton from "@/components/elements/Button/ImageUploadButton";
 import DateTimePickerGroups from "@/components/elements/DateTimePicker/DateTimePickerGroups";
-import CreatePageButtonGroups from "@/components/elements/Button/CreatePageButtonGroups";
 import LocationSelectGroups from "@/components/elements/LocationSelect/LocationSelectGroups";
 import ChildPlan from "@/components/layouts/ChildPlan";
-import BasicLocationSelect from "@/components/elements/LocationSelect/Basic/BasicLocationSelect";
 import CountIconButtonGroups from "@/components/elements/IconButton/CountIconButtonGroups";
 import CreateButton from "@/components/elements/Button/CreateButton";
 import DraftButton from "@/components/elements/Button/DraftButton";
 import CancelButton from "@/components/elements/Button/CancelButton";
 import BasicConceptSelect from "@/components/elements/ConceptSelect/Basic/BasicConceptSelect";
-import { ParentPlan } from "@/types/type";
+import { ChildPlanType } from "@/types/type";
+import { useChildPlans } from "@/hooks/useChildPlans";
 
 // 課題：createページじゃなくてモーダルで表現した方がカッコいいかも？
 // 課題：作成中にやっぱ手動作成に変えたいってなった時、情報が保持されるようにする
@@ -41,7 +41,7 @@ const CreatePlanPage = () => {
     const [value, setValue] = useState(0);
     const [count, setCount] = useState(1);
     const [isAutoCreatePlan, setIsAutoCreatePlan] = useState<boolean>(true);
-    const [plan, setPlan] = useState({
+    const [parentPlan, setParentPlan] = useState({
         planName: "",
         planThumbnail: "",
         startDateTime: "",
@@ -52,6 +52,8 @@ const CreatePlanPage = () => {
         endAreaId: "",
         conceptId: "",
     });
+
+    const [childPlans, setChildPlans] = useState<ChildPlanType[]>([]);
 
     const router = useRouter();
 
@@ -70,19 +72,61 @@ const CreatePlanPage = () => {
         }
     };
 
-    const handleSave = async (status: "Draft" | "Published") => {
-        const updatedPlan = { ...plan, status };
-
+    const saveParentPlan = async (status: "Draft" | "Published") => {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/plans/create`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(updatedPlan),
+            body: JSON.stringify({ ...parentPlan, status }),
             credentials: "include",
         });
+        const data = await response.json();
+        const newParentPlanId = data.parentPlanId;
 
-        router.push("/plans");
+        if (!newParentPlanId) throw new Error("親プランの保存に失敗しました");
+
+        return newParentPlanId;
+    };
+
+    const saveChildPlans = async (parentPlanId: string) => {
+        console.log("childPlans",childPlans)
+        const promises = childPlans.map((childPlan, index) =>
+            fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/create`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ ...childPlan, parentPlanId, order: index + 1 }),
+                credentials: "include",
+            }),
+        );
+        await Promise.all(promises);
+    };
+
+    const handleSaveAll = async (status: "Draft" | "Published") => {
+        try {
+            const parentPlanId = await saveParentPlan(status);
+            await saveChildPlans(parentPlanId);
+            alert("保存しました");
+            router.push("/plans");
+        } catch (error) {
+            console.error("保存エラー：", error);
+            alert("保存に失敗しました");
+        }
+    };
+
+    const handleAddChildPlan = () => {
+        const newPlan: ChildPlanType = {
+            childPlanId: cuid(),
+            parentPlanId: "",
+            order: childPlans.length + 1,
+            locationName: "",
+            checkInTime: null,
+            checkOutTime: null,
+            memo: "",
+        };
+        setChildPlans((prev) => [...prev, newPlan]);
     };
 
     return (
@@ -94,34 +138,34 @@ const CreatePlanPage = () => {
                         required
                         label="プラン名"
                         onChange={(e) => {
-                            setPlan({ ...plan, planName: e.target.value });
+                            setParentPlan({ ...parentPlan, planName: e.target.value });
                         }}
                     />
                     <DateTimePickerGroups
                         onStartDateTimeChange={(value) =>
-                            setPlan((prev) => ({ ...prev, startDateTime: value || "" }))
+                            setParentPlan((prev) => ({ ...prev, startDateTime: value || "" }))
                         }
                         onEndDateTimeChange={(value) =>
-                            setPlan((prev) => ({ ...prev, endDateTime: value || "" }))
+                            setParentPlan((prev) => ({ ...prev, endDateTime: value || "" }))
                         }
                     />
                     <LocationSelectGroups
-                        startAreaId={plan.startAreaId}
-                        endAreaId={plan.endAreaId}
+                        startAreaId={parentPlan.startAreaId}
+                        endAreaId={parentPlan.endAreaId}
                         onLocalChange={(key, value) => {
-                            setPlan((prev) => ({ ...prev, [key]: value }));
+                            setParentPlan((prev) => ({ ...prev, [key]: value }));
                         }}
                     />
                     <BasicConceptSelect
                         onChange={(value) => {
-                            setPlan({ ...plan, conceptId: value });
+                            setParentPlan({ ...parentPlan, conceptId: value });
                         }}
                     />
                     <TextField
                         required
                         label="旅行の目的"
                         onChange={(e) => {
-                            setPlan({ ...plan, purpose: e.target.value });
+                            setParentPlan({ ...parentPlan, purpose: e.target.value });
                         }}
                     />
                     {isAutoCreatePlan ? (
@@ -155,14 +199,18 @@ const CreatePlanPage = () => {
                             <Typography color="primary" component="h2" variant="h5">
                                 子プラン
                             </Typography>
-                            <ChildPlan />
+                            <ChildPlan
+                                childPlans={childPlans}
+                                setChildPlans={setChildPlans}
+                                autoSave={false}
+                            />
                         </>
                     )}
                 </Stack>
             </Box>
             <Stack direction="row" spacing={2} sx={{ m: 3 }}>
-                <CreateButton handleClick={() => handleSave("Published")} />
-                <DraftButton handleClick={() => handleSave("Draft")} />
+                <CreateButton handleClick={() => handleSaveAll("Published")} />
+                <DraftButton handleClick={() => handleSaveAll("Draft")} />
                 <CancelButton />
             </Stack>
         </Container>

@@ -9,12 +9,14 @@ import { useChildPlans } from "@/hooks/useChildPlans";
 
 type ChildPlanProps = {
     childPlans?: ChildPlanType[] | null;
+    setChildPlans: React.Dispatch<React.SetStateAction<ChildPlanType[]>>;
     parentPlanId?: string;
+    autoSave?: boolean;
 };
 
-const ChildPlan = ({ parentPlanId, childPlans }: ChildPlanProps) => {
+const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildPlanProps) => {
     const { plans, setPlans, handleCountUp, handleChange, handleDelete, handleDuplicate } =
-        useChildPlans({ childPlans, parentPlanId });
+        useChildPlans({ childPlans, parentPlanId, autoSave, setChildPlans });
 
     useEffect(() => {
         if (childPlans) {
