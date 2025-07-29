@@ -14,15 +14,15 @@ import BasicStatusSelect from "@/components/elements/StatusSelect/Basic/BasicSta
 const PlanDetail = ({
     parentPlan,
     childPlans,
+    setChildPlans,
 }: {
     parentPlan: ParentPlan;
     childPlans: ChildPlanType[];
+    setChildPlans: React.Dispatch<React.SetStateAction<ChildPlanType[]>>;
 }) => {
     const { plan, setPlan, handleChange, handleDelete, handleDuplicate } = useParentPlanEdit(
         parentPlan as ParentPlan,
     );
-
-
 
     const startPrefectureId = getPrefectureIdByAreaId(plan.startAreaId);
     const endPrefectureId = getPrefectureIdByAreaId(plan.endAreaId);
@@ -66,7 +66,12 @@ const PlanDetail = ({
             <Typography color="primary" component="h2" variant="h5">
                 子プラン
             </Typography>
-            <ChildPlan parentPlanId={parentPlan.parentPlanId} childPlans={childPlans} />
+            <ChildPlan
+                parentPlanId={parentPlan.parentPlanId}
+                childPlans={childPlans}
+                setChildPlans={setChildPlans}
+                autoSave={true}
+            />
             <DetailPageButtonGroups
                 planId={parentPlan.parentPlanId}
                 handleDelete={() => handleDelete(parentPlan.parentPlanId)}

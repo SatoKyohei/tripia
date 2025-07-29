@@ -34,7 +34,7 @@ const PlanDetailPage = ({ params }: { params: Promise<{ parentPlanId: string }> 
 
     return (
         <Container sx={{ mt: 5 }}>
-            {parentPlan && <PlanDetail parentPlan={parentPlan} childPlans={childPlans} />}
+            {parentPlan && <PlanDetail parentPlan={parentPlan} childPlans={childPlans} setChildPlans={setChildPlans}/>}
         </Container>
     );
 };

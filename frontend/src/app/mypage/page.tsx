@@ -1,10 +1,28 @@
+"use client";
 import { Button, Stack, TextField, Typography } from "@mui/material";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 // 課題：各<Typography>の位置関係が揃ってない
 // 課題：変更するを押したら<TextField>になり、変更できるようになる
 
 const ProfilePage = () => {
+    const [image, setImage] = useState("");
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/mypage`);
+            const data = await response.json();
+            setImage(data.image);
+            setName(data.name);
+            setEmail(data.email);
+        };
+
+        fetchData();
+    }, []);
+
     return (
         <Stack
             spacing={2}
@@ -22,11 +40,11 @@ const ProfilePage = () => {
 
             <Typography variant="body1" component="div">
                 ユーザー名：
-                <TextField variant="standard" size="small" value="testuser" />
+                <TextField variant="standard" size="small" value={name} />
             </Typography>
             <Typography variant="body1" component="div">
                 Email：
-                <TextField variant="standard" size="small" value="test@example.com" />
+                <TextField variant="standard" size="small" value={email} />
             </Typography>
             <Typography variant="body1" component="div">
                 Password：*****

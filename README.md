@@ -111,7 +111,7 @@
       - ~~フロント（hooks）~~
       - ~~フロント（UI）~~
       - ~~バックエンド~~
-    - 変更
+    - ~~変更~~
       - ~~フロント（hooks）~~
       - ~~フロント（UI）~~
       - ~~バックエンド~~
@@ -123,7 +123,7 @@
 - 記事作成ページ
   - 親プランのフォーム
     - フロント（UI）
-      - ⭐️createのpage.tsxで以下作成中
+      - ~~createのpage.tsxで以下作成中~~
         - ~~LocationSelectGroupsをどうにかする~~
         - ~~DateTimePickerGroupsをどうにかする~~
         - ~~createButtonを押下したらpublished, Draftbuttonを押下したらDraftを付加する~~
@@ -131,14 +131,15 @@
         - ~~プランを自動生成するをオフにしたら目的地の数とプラマイボタンを消す~~
         - ~~プランを自動生成する、をOFFにした時に目的地の数のフォームを消す~~
         - 子プランを手動で指定してリクエストできるよう改修⭐️
-          - フロントでchildPlanも状態管理しつつ、まとまったらリクエストできるようにする。
-          - <ChildPlan>の中で呼んでいるuseChildPlansをplan.tsx（親プラン）の方で呼び出し、必要な関数を<ChildPlan>にpropsとして渡す。そのため<ChildPlan>側の型定義も修正
-          - useChildPlansのhandleChangeも修正する。propsにautoSave = trueを入れておいて、handleChangeの中でif(autoSave){リクエスト処理}に変える。
-          - 最後のAIの回答が参考になる
-          - プラン作成できたが、子プランが作成されない
-    - フロント（hooks）
-    - バックエンド
-    - 検証
+          - ~~フロントでchildPlanも状態管理しつつ、まとまったらリクエストできるようにする。~~
+          - ~~<ChildPlan>の中で呼んでいるuseChildPlansをplan.tsx（親プラン）の方で呼び出し、必要な関数を<ChildPlan>にpropsとして渡す。そのため<ChildPlan>側の型定義も修正~~
+          - ~~useChildPlansのhandleChangeも修正する。propsにautoSave = trueを入れておいて、handleChangeの中でif(autoSave){リクエスト処理}に変える。~~
+          - ~~親子プラン作成できるようになったし、プラン詳細ページでの変更削除複製もできるようになった。ただ、プラン新規作成中の子プラン複製と削除ができない~~
+          - ~~一つ上の課題もクリア。ただ、作成ページを開くとフロントでエラーがでる。処理は問題なく実行できる。このエラーをAIに質問済み（最後の回答参考）~~
+            - ~~BasicDateTimePickerとProvidersをmomentからdayjsに変更したら、子プランで時間設定したときにエラーになる~~
+    - ~~フロント（hooks）~~
+    - ~~バックエンド~~
+    - ~~検証~~
   - 子プランの手動作成時のフォーム
     - フロント（UI）
     - フロント（hooks）
@@ -172,9 +173,13 @@
   - バックエンド
 
 ### ◯MyPage
-- 表示するものを決める（メアド、名前、プロフ写真など）
+- ~~表示するものを決める（メアド、名前、プロフ写真など）~~
 - フロント実装
+  - ~~name, image, emailの状態管理と埋め込み~~
+    - imageだけあえてまだやってない
+  - ~~バックエンドにリクエスト~~
 - バックエンド実装
+  - バックエンド書くところから（/mypage）（戻り値：name, image, email）
 
 
 ### ◯認証機能実装

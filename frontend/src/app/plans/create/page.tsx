@@ -21,7 +21,6 @@ import DraftButton from "@/components/elements/Button/DraftButton";
 import CancelButton from "@/components/elements/Button/CancelButton";
 import BasicConceptSelect from "@/components/elements/ConceptSelect/Basic/BasicConceptSelect";
 import { ChildPlanType } from "@/types/type";
-import { useChildPlans } from "@/hooks/useChildPlans";
 
 // 課題：createページじゃなくてモーダルで表現した方がカッコいいかも？
 // 課題：作成中にやっぱ手動作成に変えたいってなった時、情報が保持されるようにする
@@ -90,7 +89,6 @@ const CreatePlanPage = () => {
     };
 
     const saveChildPlans = async (parentPlanId: string) => {
-        console.log("childPlans",childPlans)
         const promises = childPlans.map((childPlan, index) =>
             fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/create`, {
                 method: "POST",
@@ -114,19 +112,6 @@ const CreatePlanPage = () => {
             console.error("保存エラー：", error);
             alert("保存に失敗しました");
         }
-    };
-
-    const handleAddChildPlan = () => {
-        const newPlan: ChildPlanType = {
-            childPlanId: cuid(),
-            parentPlanId: "",
-            order: childPlans.length + 1,
-            locationName: "",
-            checkInTime: null,
-            checkOutTime: null,
-            memo: "",
-        };
-        setChildPlans((prev) => [...prev, newPlan]);
     };
 
     return (
