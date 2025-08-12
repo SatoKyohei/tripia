@@ -13,11 +13,17 @@ const ProfilePage = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/mypage`);
-            const data = await response.json();
-            setImage(data.image);
-            setName(data.name);
-            setEmail(data.email);
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/mypage`);
+                const data = await response.json();
+                if (response.ok) {
+                    setImage(data.image);
+                    setName(data.name);
+                    setEmail(data.email);
+                }
+            } catch (error) {
+                console.error(error);
+            }
         };
 
         fetchData();

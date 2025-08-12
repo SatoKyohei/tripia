@@ -11,6 +11,8 @@ import swaggerUi from "swagger-ui-express";
 import { ValidateError } from "tsoa";
 import cookieParser from "cookie-parser";
 
+export const tokenBlacklist = new Set();
+
 const app = express();
 
 app.get("/", (req, res) => {

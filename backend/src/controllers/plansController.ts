@@ -373,3 +373,18 @@ export class ChildrenPlanController extends Controller {
         }
     }
 }
+
+// @Route("mypage")
+// export class MyPageController extends Controller {
+//     // @Response<ValidateErrorJSON>(400, "Invalid Requests")
+//     // @Response<ValidateErrorJSON>(401, "Unauthorized")
+//     // @Get()
+//     // public async getMyPage(@Request() request) {
+//         // const userId = request.user?.id;
+
+//         // if (!userId) {
+//         //     this.setStatus(401);
+//         //     return { return: "UnAuthorized" };
+//         // }
+
+//     }
