@@ -19,3 +19,14 @@ const PlanListCards = ({ plans }: { plans: ParentPlan[] }) => {
 
 export default PlanListCards;
 
+// const PlanListCards = ({ plans }: { plans: ParentPlan[] }) => {
+//   return (
+//     <Grid container spacing={3}>
+//       {plans.map((plan) => (
+//         <Grid key={plan.parentPlanId} item xs={12} sm={6} md={4} lg={3}>
+//           <BasicPlanListCard plan={plan} />
+//         </Grid>
+//       ))}
+//     </Grid>
+//   );
+// };
