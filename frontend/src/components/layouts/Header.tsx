@@ -14,20 +14,47 @@ import { useState } from "react";
 import BasicIconButton from "@/components/elements/IconButton/Basic/BasicIconButton";
 import BasicMenu from "@/components/elements/Menu/Basic/BasicMenu";
 import Logo from "@/components/elements/Logo/Logo";
+import { useAuth } from "@/libs/providers/AuthProvider";
 
 // 課題：画面上部固定になってないかも
 
-const pages = [
-    { name: "My Plans", path: "/plans" },
-];
-const settings = [
-    { name: "Dashboad", path: "mypage" },
-    { name: "Logout", path: "/logout" },
-];
+type HeaderMenuType = {
+    name: string;
+    path: string;
+    onClick?: () => void;
+};
 
 const Header = () => {
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+
+    const { isLoggedIn } = useAuth();
+
+    const pages: HeaderMenuType[] = isLoggedIn
+        ? [
+              { name: "My Plans", path: "/plans" },
+              { name: "プランを作成", path: "/plans/create" },
+              { name: "人気の旅行先", path: "#" },
+              { name: "使い方", path: "#" },
+              { name: "お知らせ", path: "#" },
+          ]
+        : [
+              { name: "ログイン", path: "/signin" },
+              { name: "人気の旅行先", path: "#" },
+              { name: "使い方", path: "#" },
+          ];
+
+    const settings: HeaderMenuType[] = [
+        { name: "Dashboard", path: "/dashboard" },
+        {
+            name: "Logout",
+            path: "/",
+            onClick: () => {
+                localStorage.removeItem("access_token");
+                window.dispatchEvent(new Event("tripia:auth-changed"));
+            },
+        },
+    ];
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
@@ -105,7 +132,7 @@ const Header = () => {
                         }}
                         iconSx={{ display: { xs: "flex", md: "none" }, mr: 1 }}
                     />
-                    <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+                    <Box sx={{ ml: "auto", display: { xs: "none", md: "flex" } }}>
                         {pages.map((page) => (
                             <Button
                                 key={page.name}
@@ -116,27 +143,31 @@ const Header = () => {
                                 {page.name}
                             </Button>
                         ))}
+                        {isLoggedIn && (
+                            <>
+                                <Tooltip title="open settings">
+                                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                        <Avatar alt="profile" src="/profile.png" />
+                                    </IconButton>
+                                </Tooltip>
+                                <BasicMenu
+                                    id="menu-appbar"
+                                    anchorEl={anchorElUser}
+                                    anchorOrigin={{
+                                        vertical: "bottom",
+                                        horizontal: "right",
+                                    }}
+                                    transformOrigin={{ vertical: "top", horizontal: "right" }}
+                                    open={Boolean(anchorElUser)}
+                                    onClose={handleCloseUserMenu}
+                                    pages={settings}
+                                    menuSx={{ mt: "45px" }}
+                                    onClick={handleCloseUserMenu}
+                                    pageNameSx={{ textAlign: "center", textDecoration: "none" }}
+                                />
+                            </>
+                        )}
                     </Box>
-                    <Tooltip title="open settings">
-                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                            <Avatar alt="profile" src="/profile.png" />
-                        </IconButton>
-                    </Tooltip>
-                    <BasicMenu
-                        id="menu-appbar"
-                        anchorEl={anchorElUser}
-                        anchorOrigin={{
-                            vertical: "bottom",
-                            horizontal: "right",
-                        }}
-                        transformOrigin={{ vertical: "top", horizontal: "right" }}
-                        open={Boolean(anchorElUser)}
-                        onClose={handleCloseUserMenu}
-                        pages={settings}
-                        menuSx={{ mt: "45px" }}
-                        onClick={handleCloseUserMenu}
-                        pageNameSx={{ textAlign: "center", textDecoration: "none" }}
-                    />
                 </Toolbar>
             </Container>
         </AppBar>

@@ -5,8 +5,8 @@ import bcrypt from "bcryptjs";
 async function main() {
     // User
     const userData = [
-        { name: "sato", email: "sato@example.com", password: "sato" },
-        { name: "tanaka", email: "tanaka@example.com", password: "tanaka" },
+        { name: "user1", email: "user1@example.com", password: "user1" },
+        { name: "user2", email: "user2@example.com", password: "user2" },
     ];
 
     const hashedUsers = await Promise.all(
@@ -89,7 +89,7 @@ async function main() {
     // ParentPlan
     const plans = [
         {
-            email: "sato@example.com",
+            email: "user1@example.com",
             startAreaId: "tokyo_toshinn",
             endAreaId: "gunnma_seimou",
             conceptId: "relax",
@@ -100,7 +100,7 @@ async function main() {
             status: PlanStatus.Published,
         },
         {
-            email: "sato@example.com",
+            email: "user1@example.com",
             startAreaId: "tokyo_fukutoshinn",
             endAreaId: "chiba_minamibousou",
             conceptId: "active",
@@ -111,7 +111,7 @@ async function main() {
             status: PlanStatus.Draft,
         },
         {
-            email: "tanaka@example.com",
+            email: "user2@example.com",
             startAreaId: "kanagawa_yokohama",
             endAreaId: "kanagawa_yokohama",
             conceptId: "shoestringTrip",
@@ -122,7 +122,7 @@ async function main() {
             status: PlanStatus.Published,
         },
         {
-            email: "tanaka@example.com",
+            email: "user2@example.com",
             startAreaId: "saitama_toubu",
             endAreaId: "ibaragi_kennou",
             conceptId: "gourmet",
@@ -133,121 +133,138 @@ async function main() {
         },
     ];
 
-    const plansWithAuthorId = plans.map((plan) => {
+    const plansWithUserId = plans.map((plan) => {
         const user = users.find((user) => user.email === plan.email);
         if (!user) {
             throw new Error(`User not found: ${plan.email}`);
         }
         return {
             ...plan,
-            authorId: user.userId,
+            userId: user.userId,
         };
     });
 
     await prisma.parentPlan.createMany({
-        data: plansWithAuthorId.map(({ email, ...rest }) => rest),
+        data: plansWithUserId.map(({ email, ...rest }) => rest),
         skipDuplicates: true,
     });
 
+    // ChildPlan
+    const parentPlans = await prisma.parentPlan.findMany();
+
+    const childPlansData = [
+        {
+            parentPlanId: parentPlans[0].parentPlanId,
+            userId: parentPlans[0].userId,
+            order: 1,
+            locationName: "行きの移動",
+            checkInTime: "2025-02-28T09:00:00+09:00",
+            checkOutTime: "2025-02-28T11:30:00+09:00",
+            memo: "",
+        },
+        {
+            parentPlanId: parentPlans[0].parentPlanId,
+            userId: parentPlans[0].userId,
+            order: 2,
+            locationName: "◯◯旅館",
+            checkInTime: "2025-02-28T11:30:00+09:00",
+            checkOutTime: "2025-03-02T16:00:00+09:00",
+            memo: "先に荷物だけ置かせてもらう",
+        },
+        {
+            parentPlanId: parentPlans[0].parentPlanId,
+            userId: parentPlans[0].userId,
+            order: 3,
+            locationName: "帰りの移動",
+            checkInTime: "2025-03-02T16:00:00+09:00",
+            checkOutTime: "2025-03-02T18:30:00+09:00",
+            memo: "",
+        },
+        {
+            parentPlanId: parentPlans[1].parentPlanId,
+            userId: parentPlans[1].userId,
+            order: 1,
+            locationName: "行きの移動",
+            checkInTime: "2025-03-21T08:30:00+09:00",
+            checkOutTime: "2025-03-21T10:30:00+09:00",
+            memo: "",
+        },
+        {
+            parentPlanId: parentPlans[1].parentPlanId,
+            userId: parentPlans[1].userId,
+            order: 2,
+            locationName: "ホテル◯◯",
+            checkInTime: "2025-03-21T10:30:00+09:00",
+            checkOutTime: "2025-03-23T18:00:00+09:00",
+            memo: "当日受け付けにて支払い",
+        },
+        {
+            parentPlanId: parentPlans[1].parentPlanId,
+            userId: parentPlans[1].userId,
+            order: 3,
+            locationName: "帰りの移動",
+            checkInTime: "2025-03-23T18:00:00+09:00",
+            checkOutTime: "2025-03-23T20:00:00+09:00",
+            memo: "",
+        },
+        {
+            parentPlanId: parentPlans[2].parentPlanId,
+            userId: parentPlans[2].userId,
+            order: 1,
+            locationName: "行きの移動",
+            checkInTime: "2025-04-21T10:00:00+09:00",
+            checkOutTime: "2025-04-21T10:30:00+09:00",
+            memo: "",
+        },
+        {
+            parentPlanId: parentPlans[2].parentPlanId,
+            userId: parentPlans[2].userId,
+            order: 2,
+            locationName: "◯◯公園",
+            checkInTime: "2025-04-21T10:30:00+09:00",
+            checkOutTime: "2025-04-21T17:30:00+09:00",
+            memo: "",
+        },
+        {
+            parentPlanId: parentPlans[2].parentPlanId,
+            userId: parentPlans[2].userId,
+            order: 3,
+            locationName: "帰りの移動",
+            checkInTime: "2025-04-21T17:30:00+09:00",
+            checkOutTime: "2025-04-21T18:00:00+09:00",
+            memo: "",
+        },
+        {
+            parentPlanId: parentPlans[3].parentPlanId,
+            userId: parentPlans[3].userId,
+            order: 1,
+            locationName: "行きの移動",
+            checkInTime: "2025-06-21T10:30:00+09:00",
+            checkOutTime: "2025-06-21T11:30:00+09:00",
+            memo: "",
+        },
+        {
+            parentPlanId: parentPlans[3].parentPlanId,
+            userId: parentPlans[3].userId,
+            order: 2,
+            locationName: "◯◯漁港",
+            checkInTime: "2025-06-21T11:30:00+09:00",
+            checkOutTime: "2025-06-21T16:00:00+09:00",
+            memo: "海鮮丼は必ず食べたい",
+        },
+        {
+            parentPlanId: parentPlans[3].parentPlanId,
+            userId: parentPlans[3].userId,
+            order: 3,
+            locationName: "帰りの移動",
+            checkInTime: "2025-06-21T16:00:00+09:00",
+            checkOutTime: "2025-06-21T17:00:00+09:00",
+            memo: "",
+        },
+    ];
+
     await prisma.childPlan.createMany({
-        data: [
-            {
-                parentPlanId: "cm7ioz25k00028zknkybn0c4t",
-                order: 1,
-                locationName: "行きの移動",
-                checkInTime: "2025-02-28T09:00:00+09:00",
-                checkOutTime: "2025-02-28T11:30:00+09:00",
-                memo:"",
-            },
-            {
-                parentPlanId: "cm7ioz25k00028zknkybn0c4t",
-                order: 2,
-                locationName: "◯◯旅館",
-                checkInTime: "2025-02-28T11:30:00+09:00",
-                checkOutTime: "2025-03-02T16:00:00+09:00",
-                memo:"先に荷物だけ置かせてもらう",
-            },
-            {
-                parentPlanId: "cm7ioz25k00028zknkybn0c4t",
-                order: 3,
-                locationName: "帰りの移動",
-                checkInTime: "2025-03-02T16:00:00+09:00",
-                checkOutTime: "2025-03-02T18:30:00+09:00",
-                memo:"",
-            },
-            {
-                parentPlanId: "cm7ioz25k00038zkn65fxe58y",
-                order: 1,
-                locationName: "行きの移動",
-                checkInTime: "2025-03-21T08:30:00+09:00",
-                checkOutTime: "2025-03-21T10:30:00+09:00",
-                memo:"",
-            },
-            {
-                parentPlanId: "cm7ioz25k00038zkn65fxe58y",
-                order: 2,
-                locationName: "ホテル◯◯",
-                checkInTime: "2025-03-21T10:30:00+09:00",
-                checkOutTime: "2025-03-23T18:00:00+09:00",
-                memo:"当日受け付けにて支払い",
-            },
-            {
-                parentPlanId: "cm7ioz25k00038zkn65fxe58y",
-                order: 3,
-                locationName: "帰りの移動",
-                checkInTime: "2025-03-23T18:00:00+09:00",
-                checkOutTime: "2025-03-23T20:00:00+09:00",
-                memo:"",
-            },
-            {
-                parentPlanId: "cm7ioz25l00048zkn5mjhgcrj",
-                order: 1,
-                locationName: "行きの移動",
-                checkInTime: "2025-04-21T10:00:00+09:00",
-                checkOutTime: "2025-04-21T10:30:00+09:00",
-                memo:"",
-            },
-            {
-                parentPlanId: "cm7ioz25l00048zkn5mjhgcrj",
-                order: 2,
-                locationName: "◯◯公園",
-                checkInTime: "2025-04-21T10:30:00+09:00",
-                checkOutTime: "2025-04-21T17:30:00+09:00",
-                memo:"",
-            },
-            {
-                parentPlanId: "cm7ioz25l00048zkn5mjhgcrj",
-                order: 3,
-                locationName: "帰りの移動",
-                checkInTime: "2025-04-21T17:30:00+09:00",
-                checkOutTime: "2025-04-21T18:00:00+09:00",
-                memo:"",
-            },
-            {
-                parentPlanId: "cm7ioz25l00058zknrdlagz8o",
-                order: 1,
-                locationName: "行きの移動",
-                checkInTime: "2025-06-21T10:30:00+09:00",
-                checkOutTime: "2025-06-21T11:30:00+09:00",
-                memo:"",
-            },
-            {
-                parentPlanId: "cm7ioz25l00058zknrdlagz8o",
-                order: 2,
-                locationName: "◯◯漁港",
-                checkInTime: "2025-06-21T11:30:00+09:00",
-                checkOutTime: "2025-06-21T16:00:00+09:00",
-                memo:"海鮮丼は必ず食べたい",
-            },
-            {
-                parentPlanId: "cm7ioz25l00058zknrdlagz8o",
-                order: 3,
-                locationName: "帰りの移動",
-                checkInTime: "2025-06-21T16:00:00+09:00",
-                checkOutTime: "2025-06-21T17:00:00+09:00",
-                memo:"",
-            },
-        ],
+        data: childPlansData,
         skipDuplicates: true,
     });
 }

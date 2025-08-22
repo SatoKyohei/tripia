@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "PlanStatus" AS ENUM ('Draft', 'Published', 'Completed');
+CREATE TYPE "PlanStatus" AS ENUM ('Draft', 'Published');
 
 -- CreateTable
 CREATE TABLE "user" (
@@ -51,16 +51,16 @@ CREATE TABLE "concept" (
 -- CreateTable
 CREATE TABLE "parent_plan" (
     "parent_plan_id" TEXT NOT NULL,
-    "author_id" TEXT NOT NULL,
-    "start_area_id" TEXT NOT NULL,
-    "end_area_id" TEXT NOT NULL,
-    "concept_id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
     "plan_name" VARCHAR(255) NOT NULL,
-    "plan_thumbnail" BYTEA,
+    "plan_thumbnail" TEXT,
     "start_date_time" TIMESTAMP(3) NOT NULL,
     "end_date_time" TIMESTAMP(3) NOT NULL,
     "purpose" VARCHAR(255),
     "status" "PlanStatus" NOT NULL DEFAULT 'Draft',
+    "start_area_id" TEXT NOT NULL,
+    "end_area_id" TEXT NOT NULL,
+    "concept_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -71,6 +71,7 @@ CREATE TABLE "parent_plan" (
 CREATE TABLE "child_plan" (
     "child_plan_id" TEXT NOT NULL,
     "parent_plan_id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
     "order" INTEGER NOT NULL,
     "location_name" TEXT NOT NULL,
     "check_in_time" TIMESTAMP(3),

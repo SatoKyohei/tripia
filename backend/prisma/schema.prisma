@@ -65,7 +65,7 @@ model Concept {
 
 model ParentPlan {
   parentPlanId    String     @id @default(cuid()) @map("parent_plan_id")
-  authorId        String     @map("author_id")
+  userId        String     @map("user_id")
   planName        String     @db.VarChar(255) @map("plan_name")
   planThumbnail   String?     @map("plan_thumbnail")
   startDateTime   DateTime   @map("start_date_time")
@@ -90,6 +90,7 @@ model ParentPlan {
 model ChildPlan {
   childPlanId    String       @id @default(cuid()) @map("child_plan_id")
   parentPlanId   String       @map("parent_plan_id")
+  userId        String        @map("user_id")
   order          Int
   locationName   String       @map("location_name")
   checkInTime    DateTime?    @map("check_in_time")// 下書き時点では必須項目ではないためnullを許容

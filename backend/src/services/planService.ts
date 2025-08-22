@@ -17,6 +17,7 @@ type ParentPlanParams = {
 type childPlan = {
     childPlanId?: string;
     parentPlanId: string;
+    userId: string;
     order: number;
     locationName: string;
     checkInTime: Date | null;
@@ -27,7 +28,7 @@ type childPlan = {
 export const childPlanService = {
     async duplicateChildPlanToSameParentPlan(
         childPlanId: string,
-    ): Promise<Omit<childPlan, "createdAt" | "updatedAt">> {
+    ): Promise<Omit<childPlan, "createdAt" | "updatedAt" | "userId">> {
         const duplicateChildPlan = await prisma.childPlan.findUnique({
             where: {
                 childPlanId,
@@ -55,6 +56,7 @@ export const childPlanService = {
             data: {
                 parentPlanId,
                 order: duplicateChildPlan?.order + 1,
+                userId: duplicateChildPlan.userId,
                 locationName: duplicateChildPlan.locationName,
                 checkInTime: duplicateChildPlan?.checkInTime,
                 checkOutTime: duplicateChildPlan?.checkOutTime,
@@ -62,7 +64,12 @@ export const childPlanService = {
             },
         });
 
-        const { createdAt: _createdAt, updatedAt: _updatedAt, ...newChildPlan } = response;
+        const {
+            createdAt: _createdAt,
+            updatedAt: _updatedAt,
+            userId: _,
+            ...newChildPlan
+        } = response;
 
         return newChildPlan;
     },
@@ -76,7 +83,7 @@ export const childPlanService = {
             },
             select: {
                 planName: true,
-                authorId: true,
+                userId: true,
                 planThumbnail: true,
                 startDateTime: true,
                 endDateTime: true,
@@ -132,6 +139,7 @@ export const childPlanService = {
             await prisma.childPlan.create({
                 data: {
                     parentPlanId: newParentPlanId,
+                    userId: duplicateParentPlan.userId,
                     order: childPlans[i].order,
                     locationName: childPlans[i].locationName,
                     checkInTime: childPlans[i].checkInTime,
@@ -143,4 +151,13 @@ export const childPlanService = {
 
         return newParentPlan;
     },
+};
+
+export const savePlanImage = async (planId: string, imageURL: string) => {
+    return await prisma.parentPlan.update({
+        where: {
+            parentPlanId: planId,
+        },
+        data: { planThumbnail: imageURL },
+    });
 };

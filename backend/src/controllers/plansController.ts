@@ -19,7 +19,7 @@ import { childPlanService } from "../services/planService";
 
 type ParentPlan = {
     parentPlanId: string;
-    authorId: string;
+    userId: string;
     planName: string;
     planThumbnail: string | null;
     startDateTime: Date;
@@ -29,6 +29,8 @@ type ParentPlan = {
     startAreaId: string;
     endAreaId: string;
     conceptId: string;
+    createdAt: Date;
+    updatedAt: Date;
 };
 
 type ChildPlan = {
@@ -47,13 +49,20 @@ type ParentAndChildPlan = {
 };
 
 @Route("plans")
-// @Security("jwt")
+@Security("jwt")
 export class PlanController extends Controller {
     @Response<ValidateErrorJSON>(500, "Internal Server Error")
     @Get()
-    public async getAllParentPlans(): Promise<ParentPlan[] | { message: string }> {
+    public async getAllParentPlans(
+        @Request() req: any,
+    ): Promise<ParentPlan[] | { message: string }> {
         try {
-            const parentPlans = await prisma.parentPlan.findMany();
+            const userId = req.user.userId;
+            const parentPlans = await prisma.parentPlan.findMany({
+                where: {
+                    userId,
+                },
+            });
             return parentPlans;
         } catch (error) {
             this.setStatus(500);
@@ -66,8 +75,10 @@ export class PlanController extends Controller {
     @Get("{parentPlanId}")
     public async getParentPlan(
         parentPlanId: string,
+        @Request() req: any,
     ): Promise<ParentAndChildPlan | { message: string }> {
         try {
+            const userId = req.user.userId;
             const parentPlan = await prisma.parentPlan.findUnique({
                 where: {
                     parentPlanId,
@@ -80,6 +91,11 @@ export class PlanController extends Controller {
                 },
                 orderBy: { order: "asc" },
             });
+
+            if (parentPlan?.userId !== userId) {
+                this.setStatus(403);
+                return { message: "アクセス権限がありません" };
+            }
 
             if (!parentPlan || !childPlans) {
                 this.setStatus(404);
@@ -99,7 +115,8 @@ export class PlanController extends Controller {
     @Post("create")
     public async createParentPlan(
         @Request() request: AuthenticateRequest,
-        @Body() requestBody: Omit<ParentPlan, "parentPlanId" | "authorId">,
+        @Body()
+        requestBody: Omit<ParentPlan, "parentPlanId" | "userId" | "createdAt" | "updatedAt">,
     ): Promise<{ message?: string } | { message?: string; parentPlanId: string } | void> {
         const {
             planName,
@@ -113,11 +130,10 @@ export class PlanController extends Controller {
             conceptId,
         } = requestBody;
 
-        // 課題：認証の実装ができておらず、ダミーのauthorIdを指定している
-        // const authorId = request.user?.userId;
-        const authorId = "dummy-user-id";
+        // 課題：認証の実装ができておらず、ダミーのuserIdを指定している
+        const userId = request.user?.userId;
 
-        if (authorId === undefined) {
+        if (userId === undefined) {
             this.setStatus(401);
             return { message: "著者IDが定義されていません" };
         }
@@ -129,7 +145,7 @@ export class PlanController extends Controller {
 
         const newParentPlan = await prisma.parentPlan.create({
             data: {
-                authorId,
+                userId,
                 planName,
                 planThumbnail,
                 startDateTime,
@@ -153,7 +169,7 @@ export class PlanController extends Controller {
         @Body() requestBody: any,
     ): Promise<{ message?: string } | void> {
         const {
-            authorId,
+            userId,
             parentPlanId,
             planName,
             planThumbnail,
@@ -169,7 +185,7 @@ export class PlanController extends Controller {
         await prisma.parentPlan.update({
             where: { parentPlanId },
             data: {
-                authorId,
+                userId,
                 planName,
                 planThumbnail,
                 startDateTime,
@@ -241,23 +257,36 @@ export class PlanController extends Controller {
 
 @Route("child-plans")
 // 課題：createをupdateと一緒にしているが、やっぱわける
-// @Security("jwt")
+@Security("jwt")
 export class ChildrenPlanController extends Controller {
     @Response<ValidateErrorJSON>(400, "Invalid Requests")
     @Response<ValidateErrorJSON>(401, "Unauthorized")
     @Post("create")
     public async createChildPlan(
-        @Request() request: AuthenticateRequest,
+        @Request() req: AuthenticateRequest,
         @Body() requestBody: ChildPlan,
     ): Promise<{ message?: string } | { message?: string; newChildPlan: ChildPlan } | void> {
         try {
+            const userId = req.user!.userId;
             const { parentPlanId, order, locationName, checkInTime, checkOutTime, memo } =
                 requestBody;
+
+            const parentPlan = await prisma.parentPlan.findUnique({
+                where: {
+                    parentPlanId,
+                },
+            });
+
+            if (userId !== parentPlan?.userId) {
+                this.setStatus(403);
+                return { message: "アクセス権限がありません" };
+            }
 
             const response = await prisma.childPlan.create({
                 data: {
                     parentPlanId,
                     order,
+                    userId,
                     locationName,
                     checkInTime,
                     checkOutTime,
@@ -265,7 +294,7 @@ export class ChildrenPlanController extends Controller {
                 },
             });
 
-            const { createdAt, updatedAt, ...newChildPlan } = response;
+            const { createdAt, updatedAt, userId: _, ...newChildPlan } = response;
 
             this.setStatus(200);
             return { message: "Successfully created child plan", newChildPlan };
@@ -284,8 +313,27 @@ export class ChildrenPlanController extends Controller {
         @Body() requestBody: ChildPlan,
     ): Promise<{ message?: string } | void> {
         try {
-            const { childPlanId, order, locationName, checkInTime, checkOutTime, memo } =
-                requestBody;
+            const userId = request.user?.userId;
+            const {
+                parentPlanId,
+                childPlanId,
+                order,
+                locationName,
+                checkInTime,
+                checkOutTime,
+                memo,
+            } = requestBody;
+
+            const parentPlan = await prisma.parentPlan.findUnique({
+                where: {
+                    parentPlanId,
+                },
+            });
+
+            if (userId !== parentPlan?.userId) {
+                this.setStatus(403);
+                return { message: "アクセス権限がありません" };
+            }
 
             await prisma.childPlan.update({
                 where: {
@@ -313,11 +361,13 @@ export class ChildrenPlanController extends Controller {
     @Response<ValidateErrorJSON>(401, "Unauthorized")
     @Delete("{childPlanId}")
     public async deleteChildPlan(
+        @Request() request: AuthenticateRequest,
         @Path() childPlanId: string,
     ): Promise<
         { message?: string } | { message?: string; remainingChildPlans: ChildPlan[] } | void
     > {
         try {
+            const userId = request.user?.userId;
             const childPlan = await prisma.childPlan.findUnique({
                 where: {
                     childPlanId,
@@ -325,6 +375,17 @@ export class ChildrenPlanController extends Controller {
             });
 
             const parentPlanId = childPlan?.parentPlanId;
+
+            const parentPlan = await prisma.parentPlan.findUnique({
+                where: {
+                    parentPlanId,
+                },
+            });
+
+            if (userId !== parentPlan?.userId) {
+                this.setStatus(403);
+                return { message: "アクセス権限がありません" };
+            }
 
             await prisma.childPlan.delete({
                 where: {
@@ -360,9 +421,28 @@ export class ChildrenPlanController extends Controller {
     @Response<ValidateErrorJSON>(401, "Unauthorized")
     @Post("{childPlanId}/duplicate")
     public async duplicateChildPlan(
+        @Request() request: AuthenticateRequest,
         @Path() childPlanId: string,
     ): Promise<{ message?: string } | { message?: string; newChildPlan: ChildPlan } | void> {
         try {
+            const userId = request.user?.userId;
+            const childPlan = await prisma.childPlan.findUnique({
+                where: {
+                    childPlanId,
+                },
+            });
+
+            const parentPlan = await prisma.parentPlan.findUnique({
+                where: {
+                    parentPlanId: childPlan?.parentPlanId,
+                },
+            });
+
+            if (userId !== parentPlan?.userId) {
+                this.setStatus(403);
+                return { message: "アクセス権限がありません" };
+            }
+
             const newChildPlan =
                 await childPlanService.duplicateChildPlanToSameParentPlan(childPlanId);
             return { message: "Successfully duplicated child plans", newChildPlan };
@@ -373,18 +453,3 @@ export class ChildrenPlanController extends Controller {
         }
     }
 }
-
-// @Route("mypage")
-// export class MyPageController extends Controller {
-//     // @Response<ValidateErrorJSON>(400, "Invalid Requests")
-//     // @Response<ValidateErrorJSON>(401, "Unauthorized")
-//     // @Get()
-//     // public async getMyPage(@Request() request) {
-//         // const userId = request.user?.id;
-
-//         // if (!userId) {
-//         //     this.setStatus(401);
-//         //     return { return: "UnAuthorized" };
-//         // }
-
-//     }

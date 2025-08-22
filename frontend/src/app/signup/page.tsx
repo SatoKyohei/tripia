@@ -1,4 +1,7 @@
+"use client";
 import { Button, Divider, Stack, TextField, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 // 課題：Googleアイコンがない
 // 課題：<Button></Button>要素で囲むと大文字になる
@@ -7,6 +10,34 @@ import { Button, Divider, Stack, TextField, Typography } from "@mui/material";
 // 課題：<Divider>が効かない
 
 const SignUpPage = () => {
+    const [name, setName] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const router = useRouter();
+
+    const handleSignUp = async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/register`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ name, email, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "ユーザーの作成に失敗しました");
+            }
+
+            alert(data.message);
+            router.push("/signin");
+        } catch (error) {
+            alert(error || "ユーザーの作成に失敗しました");
+        }
+    };
+
     return (
         <Stack
             flexDirection="column"
@@ -25,10 +56,29 @@ const SignUpPage = () => {
             <Typography variant="h5" component="h2">
                 Sign Up
             </Typography>
-            <TextField size="small" label="ユーザー名" sx={{ width: "80%" }} />
-            <TextField size="small" label="Email" sx={{ width: "80%" }} />
-            <TextField size="small" label="Password" type="password" sx={{ width: "80%" }} />
-            <Button variant="contained" sx={{ width: "80%" }}>
+            <TextField
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                size="small"
+                label="Name"
+                sx={{ width: "80%" }}
+            />
+            <TextField
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                size="small"
+                label="Email"
+                sx={{ width: "80%" }}
+            />
+            <TextField
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                size="small"
+                label="Password"
+                type="password"
+                sx={{ width: "80%" }}
+            />
+            <Button variant="contained" onClick={handleSignUp} sx={{ width: "80%" }}>
                 Sign Up
             </Button>
             <Divider>

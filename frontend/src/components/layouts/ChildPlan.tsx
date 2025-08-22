@@ -6,7 +6,6 @@ import CountUpIconButton from "@/components/elements/IconButton/CountUpIconButto
 import ChildPlanButtonGroups from "@/components/elements/Button/ChildPlanButtonGroups";
 import type { ChildPlanType } from "@/types/type";
 
-
 type ChildPlanProps = {
     childPlans?: ChildPlanType[];
     setChildPlans: React.Dispatch<React.SetStateAction<ChildPlanType[]>>;
@@ -15,6 +14,8 @@ type ChildPlanProps = {
 };
 
 const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildPlanProps) => {
+    const token = localStorage.getItem("access_token");
+
     const handleCountUp = async () => {
         if (!childPlans) return;
         const tempId = cuid();
@@ -23,8 +24,8 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
             parentPlanId: parentPlanId ?? "",
             order: childPlans.length + 1,
             locationName: "",
-            checkInTime: "",
-            checkOutTime: "",
+            checkInTime: null,
+            checkOutTime: null,
             memo: "",
         };
 
@@ -40,9 +41,10 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(planDataForAPI),
-            credentials: "include",
+            // credentials: "include",
         });
 
         const responseData = await response.json();
@@ -54,7 +56,6 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
     };
 
     const handleChange = async (childPlanId: string, key: keyof ChildPlanType, value: string) => {
-
         setChildPlans((prev) => {
             const updatedPlans = prev.map((plan) =>
                 plan.childPlanId === childPlanId ? { ...plan, [key]: value } : plan,
@@ -62,15 +63,16 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
 
             if (autoSave) {
                 const tempPlan = updatedPlans.find((plan) => plan.childPlanId === childPlanId);
-                const { createdAt, updatedAt, ...targetPlan } = tempPlan;
+                const { createdAt, updatedAt, userId, ...targetPlan } = tempPlan;
 
                 fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/update`, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify(targetPlan),
-                    credentials: "include",
+                    // credentials: "include",
                 }).then((response) => {
                     if (!response.ok) {
                         console.error("Failed to save child plan");
@@ -97,6 +99,7 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
                 method: "Delete",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                 },
                 credentials: "include",
             },
@@ -136,6 +139,7 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                 },
                 credentials: "include",
             },

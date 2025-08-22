@@ -6,23 +6,33 @@ import { useEffect, useState } from "react";
 // 課題：各<Typography>の位置関係が揃ってない
 // 課題：変更するを押したら<TextField>になり、変更できるようになる
 
-const ProfilePage = () => {
-    const [image, setImage] = useState("");
+const DashboardPage = () => {
+    const [thumbnail, setThumbnail] = useState("");
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
 
     useEffect(() => {
+        const token = localStorage.getItem("access_token");
         const fetchData = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/mypage`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/dashboard`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
                 const data = await response.json();
-                if (response.ok) {
-                    setImage(data.image);
-                    setName(data.name);
-                    setEmail(data.email);
-                }
+
+                if (!response.ok) throw new Error("ユーザー取得に失敗しました");
+
+                setThumbnail(data.profileThumbnail);
+                setName(data.name);
+                setEmail(data.email);
             } catch (error) {
                 console.error(error);
+                throw new Error("ユーザー取得に失敗しました");
             }
         };
 
@@ -52,12 +62,9 @@ const ProfilePage = () => {
                 Email：
                 <TextField variant="standard" size="small" value={email} />
             </Typography>
-            <Typography variant="body1" component="div">
-                Password：*****
-            </Typography>
             <Button variant="contained">変更する</Button>
         </Stack>
     );
 };
 
-export default ProfilePage;
+export default DashboardPage;

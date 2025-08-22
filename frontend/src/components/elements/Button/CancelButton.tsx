@@ -3,7 +3,7 @@ import BasicButton from "@/components/elements/Button/Basic/BasicButton";
 const CancelButton = () => {
     return (
         <BasicButton
-            buttonName="キャンセル"
+            buttonName="一覧に戻る"
             component="button"
             href="/plans"
             variant="contained"

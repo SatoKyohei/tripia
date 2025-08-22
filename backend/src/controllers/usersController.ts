@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import { SECRET_KEY } from "../config";
 import { tokenBlacklist } from "..";
 
-
 const prisma = new PrismaClient();
 
 type UserCreationParams = Pick<User, "email" | "name" | "password">;
@@ -58,6 +57,7 @@ export class UsersController extends Controller {
                 },
             });
             this.setStatus(201);
+            return { message: "ユーザーの作成に成功しました" };
         } catch (error) {
             console.error(error);
             this.setStatus(500);
@@ -119,4 +119,3 @@ export class UsersController extends Controller {
         return { message: "トークンが提供されていません" };
     }
 }
-

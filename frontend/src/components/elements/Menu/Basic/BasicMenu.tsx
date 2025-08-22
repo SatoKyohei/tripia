@@ -6,6 +6,7 @@ import { Menu, MenuItem, Typography } from "@mui/material";
 type Page = {
     name: string;
     path: string;
+    onClick?: () => void;
 };
 
 type Origin = {
@@ -49,7 +50,13 @@ const BasicMenu = ({
             sx={menuSx}
         >
             {pages.map((page) => (
-                <MenuItem key={page.name} onClick={onClick}>
+                <MenuItem
+                    key={page.name}
+                    onClick={() => {
+                        if (page.onClick) page.onClick();
+                        onClick();
+                    }}
+                >
                     <Typography href={`${page.path}`} component="a" sx={pageNameSx}>
                         {page.name}
                     </Typography>

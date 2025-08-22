@@ -18,3 +18,4 @@ const PlanListCards = ({ plans }: { plans: ParentPlan[] }) => {
 };
 
 export default PlanListCards;
+

@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import cuid from "cuid";
 import ImageUploadButton from "@/components/elements/Button/ImageUploadButton";
 import DateTimePickerGroups from "@/components/elements/DateTimePicker/DateTimePickerGroups";
 import LocationSelectGroups from "@/components/elements/LocationSelect/LocationSelectGroups";
@@ -72,14 +71,18 @@ const CreatePlanPage = () => {
     };
 
     const saveParentPlan = async (status: "Draft" | "Published") => {
+        const token = localStorage.getItem("access_token");
+
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/plans/create`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({ ...parentPlan, status }),
-            credentials: "include",
+            // credentials: "include",
         });
+
         const data = await response.json();
         const newParentPlanId = data.parentPlanId;
 
@@ -89,11 +92,13 @@ const CreatePlanPage = () => {
     };
 
     const saveChildPlans = async (parentPlanId: string) => {
+        const token = localStorage.getItem("access_token");
         const promises = childPlans.map((childPlan, index) =>
             fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/create`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({ ...childPlan, parentPlanId, order: index + 1 }),
                 credentials: "include",

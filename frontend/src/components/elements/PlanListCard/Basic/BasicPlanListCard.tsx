@@ -6,7 +6,7 @@ const BasicPlanListCard = ({ plan }: { plan: ParentPlan }) => {
     return (
         <Link href={`plans/${plan.parentPlanId}`} style={{ textDecoration: "none" }}>
             <Card>
-                <CardMedia sx={{ height: 145 }} image="https://picsum.photos/800" />
+                <CardMedia sx={{ height: 145 }} image={plan.planThumbnail ?? undefined} />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
                         {plan.planName}

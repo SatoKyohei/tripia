@@ -3,7 +3,7 @@ export type PlanStatus = "Draft" | "Published";
 
 export type ParentPlan = {
     parentPlanId: string;
-    authorId: string;
+    userId: string;
     conceptName: string;
     planName: string;
     planThumbnail: string | null;
@@ -17,11 +17,13 @@ export type ParentPlan = {
     endPrefectureName?: string;
     startAreaName?: string;
     endAreaName?: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type ParentPlanParams = {
     parentPlanId: string;
-    authorId: string;
+    userId: string;
     planName: string;
     planThumbnail?: string | null; // Uint8Arrayからstringに変更
     startDateTime: string; // Date型ではなく、ISO8601形式のstringを使用
@@ -35,7 +37,7 @@ export type ParentPlanParams = {
 
 export type ParentPlanDetail = {
     parentPlanId: string;
-    authorId: string;
+    userId: string;
     planName: string;
     planThumbnail: string | null;
     startDateTime: string;
