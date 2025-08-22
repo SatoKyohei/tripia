@@ -7,9 +7,9 @@ import { ParentPlan } from "@/types/type";
 
 const PlanListCards = ({ plans }: { plans: ParentPlan[] }) => {
     return (
-        <Grid2 container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+        <Grid2 container spacing={3}>
             {plans.map((plan) => (
-                <Grid2 key={plan.parentPlanId} size={{ xs: 2, sm: 4, md: 4 }}>
+                <Grid2 key={plan.parentPlanId} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                     <BasicPlanListCard plan={plan} />
                 </Grid2>
             ))}
@@ -19,14 +19,3 @@ const PlanListCards = ({ plans }: { plans: ParentPlan[] }) => {
 
 export default PlanListCards;
 
-// const PlanListCards = ({ plans }: { plans: ParentPlan[] }) => {
-//   return (
-//     <Grid container spacing={3}>
-//       {plans.map((plan) => (
-//         <Grid key={plan.parentPlanId} item xs={12} sm={6} md={4} lg={3}>
-//           <BasicPlanListCard plan={plan} />
-//         </Grid>
-//       ))}
-//     </Grid>
-//   );
-// };

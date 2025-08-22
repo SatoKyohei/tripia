@@ -1,5 +1,5 @@
 "use client";
-import { Box, Container } from "@mui/material";
+import { Box, Container, Divider, Stack, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import PlanListCards from "@/components/layouts/PlanListCards";
@@ -8,13 +8,11 @@ import BasicSort from "@/components/elements/Sort/Basic/BasicSort";
 import BasicButton from "@/components/elements/Button/Basic/BasicButton";
 import { ParentPlan } from "@/types/type";
 
-
 const PlanListPage = () => {
     const [plans, setPlans] = useState<ParentPlan[]>([]);
     const [filter, setFilter] = useState("all");
     const [sort, setSort] = useState("新しい順");
     const router = useRouter();
-
 
     useEffect(() => {
         const fetchData = async () => {
@@ -60,22 +58,35 @@ const PlanListPage = () => {
     }, [plans, sort, filter]);
 
     return (
-        <Container sx={{ marginTop: 5 }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <BasicSort onChange={setSort} />
-                <BasicFilter onChange={setFilter} />
-            </Box>
-            <Box>
+        <Container maxWidth="lg" sx={{ mt: 5, mb: 8 }}>
+            {/* タイトル */}
+            <Typography variant="h4" fontWeight="bold" gutterBottom>
+                プラン一覧
+            </Typography>
+            <Divider sx={{ mb: 4 }} />
+
+            {/* ソート・フィルター操作 */}
+            <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                justifyContent="space-between"
+                alignItems={{ xs: "flex-start", sm: "center" }}
+            >
+                <Stack direction="row" spacing={2}>
+                    <BasicSort onChange={setSort} />
+                    <BasicFilter onChange={setFilter} />
+                </Stack>
                 <BasicButton
                     buttonName="プランを作成する"
                     color="success"
                     component="button"
                     href="/plans/create"
-                    sx={{ marginTop: 5 }}
                     variant="contained"
                 />
-            </Box>
-            <Box sx={{ marginTop: 10 }}>
+            </Stack>
+
+            {/* プランカード一覧 */}
+            <Box sx={{ mt: 6 }}>
                 <PlanListCards plans={filteredAndSortedPlans} />
             </Box>
         </Container>

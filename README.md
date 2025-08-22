@@ -214,11 +214,11 @@
 - 次（以下どの順からやってもOK）
   - Googleの新規登録
   - Googleのログイン
-  - プラン一覧ページのUI修正
   - プラン作成ページのUI修正
   - プラン詳細ページのUI修正
   - ダッシュボードのUI修正
 - 前回
+  - プラン一覧ページのUI修正
   - サムネ画像の実装（AWS S3）⭐️
     - ImageUploadService.ts作成
     - ImageUploader.tsx作成
