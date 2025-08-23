@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { useState } from "react";
+import { Box } from "@mui/material";
 import { uploadImage } from "@/services/uploadImage";
 
 type ImageUploaderProps = {
@@ -24,7 +25,17 @@ const ImageUploader = ({ parentPlanId, setFile, imageURL, setImageURL }: ImageUp
     return (
         <div>
             <input type="file" onChange={handleChange} accept="image/*" />
-            {imageURL && <Image src={imageURL} alt="preview" width={500} height={500} />}
+            {imageURL && (
+                <Box sx={{ mt: 2 }}>
+                    <Image
+                        src={imageURL}
+                        alt="サムネイル画像"
+                        width={500}
+                        height={300}
+                        style={{ objectFit: "cover", borderRadius: "12px" }}
+                    />
+                </Box>
+            )}
         </div>
     );
 };

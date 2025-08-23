@@ -1,7 +1,18 @@
 "use client";
-import { Stack, TextField, Typography } from "@mui/material";
+import {
+    Box,
+    Card,
+    CardContent,
+    CardHeader,
+    Divider,
+    Grid2,
+    Stack,
+    TextField,
+    Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import DateTimePickerGroups from "@/components/elements/DateTimePicker/DateTimePickerGroups";
 import LocationSelectGroups from "@/components/elements/LocationSelect/LocationSelectGroups";
 import ChildPlan from "@/components/layouts/ChildPlan";
@@ -105,61 +116,106 @@ const PlanDetail = ({
     };
 
     return (
-        <Stack spacing={3}>
-            {/* 課題：ここにサムネ画像 */}
-            {/* <Image src={parentPlan?.planThumbnail} alt="サムネイル"/> */}
-            <ImageUploader
-                parentPlanId={parentPlan.parentPlanId}
-                setFile={setFile}
-                imageURL={imageURL}
-                setImageURL={setImageURL}
-            />
-            <TextField
-                required
-                defaultValue={plan?.planName}
-                onBlur={(e) => handleChange(plan.parentPlanId, "planName", e.target.value)}
-            />
-            <DateTimePickerGroups
-                startDateTime={plan?.startDateTime ?? ""}
-                endDateTime={plan?.endDateTime ?? ""}
-                onStartDateTimeChange={(value) =>
-                    handleChange(plan.parentPlanId, "startDateTime", value ?? "")
-                }
-                onEndDateTimeChange={(value) =>
-                    handleChange(plan.parentPlanId, "endDateTime", value ?? "")
-                }
-            />
-            <LocationSelectGroups
-                startPrefectureId={startPrefectureId}
-                startAreaId={plan.startAreaId}
-                endPrefectureId={endPrefectureId}
-                endAreaId={plan.endAreaId}
-                parentPlanId={plan.parentPlanId}
-                handleChange={handleChange}
-            />
-            {/* <PrimaryLocationSelect label={labels.concept} options={concepts} /> */}
-            <TextField
-                defaultValue={plan?.purpose}
-                onBlur={(e) => handleChange(plan.parentPlanId, "purpose", e.target.value)}
-            />
-            <BasicStatusSelect
-                status={plan.status}
-                onChange={(value) => handleChange(plan.status, "status", value)}
-            />
-            <Typography color="primary" component="h2" variant="h5">
-                子プラン
-            </Typography>
-            <ChildPlan
-                parentPlanId={parentPlan.parentPlanId}
-                childPlans={childPlans}
-                setChildPlans={setChildPlans}
-                autoSave={true}
-            />
-            <DetailPageButtonGroups
-                handleDelete={() => handleDelete(parentPlan.parentPlanId)}
-                handleDuplicate={() => handleDuplicate(parentPlan.parentPlanId)}
-            />
-        </Stack>
+        <Box sx={{ p: 4 }}>
+            <Grid2 container spacing={4}>
+                
+                {/* 左カラム */}
+                <Grid2 size={{ xs: 12, md: 6 }}>
+                    <Card>
+                        <CardHeader title="プラン概要" />
+                        <CardContent>
+                            <TextField
+                                fullWidth
+                                label="タイトル"
+                                value={plan.planName}
+                                onChange={(e) =>
+                                    handleChange(plan.parentPlanId, "planName", e.target.value)
+                                }
+                                sx={{ mb: 2 }}
+                            />
+                            <BasicStatusSelect
+                                status={plan.status}
+                                onChange={(value) => handleChange(plan.status, "status", value)}
+                            />
+                            <Divider sx={{ my: 3 }} />
+                            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                                サムネイル画像
+                            </Typography>
+                            <ImageUploader
+                                parentPlanId={parentPlan.parentPlanId}
+                                setFile={setFile}
+                                imageURL={imageURL}
+                                setImageURL={setImageURL}
+                            />
+                            <Divider sx={{ my: 3 }} />
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={3}
+                                label="目的"
+                                value={plan.purpose}
+                                onChange={(e) =>
+                                    handleChange(plan.parentPlanId, "purpose", e.target.value)
+                                }
+                            />
+                        </CardContent>
+                    </Card>
+                </Grid2>
+
+                {/* 右カラム */}
+                <Grid2 size={{ xs: 12, md: 6 }}>
+                    <Card>
+                        <CardHeader title="場所と時間" />
+                        <CardContent>
+                            <LocationSelectGroups
+                                startPrefectureId={startPrefectureId}
+                                startAreaId={plan.startAreaId}
+                                endPrefectureId={endPrefectureId}
+                                endAreaId={plan.endAreaId}
+                                parentPlanId={plan.parentPlanId}
+                                handleChange={handleChange}
+                            />
+                            <Divider sx={{ my: 3 }} />
+                            <DateTimePickerGroups
+                                startDateTime={plan?.startDateTime ?? ""}
+                                endDateTime={plan?.endDateTime ?? ""}
+                                onStartDateTimeChange={(value) =>
+                                    handleChange(plan.parentPlanId, "startDateTime", value ?? "")
+                                }
+                                onEndDateTimeChange={(value) =>
+                                    handleChange(plan.parentPlanId, "endDateTime", value ?? "")
+                                }
+                            />
+                        </CardContent>
+                    </Card>
+                </Grid2>
+
+                {/* 子プランセクション */}
+                <Grid2 size={{ xs: 12 }}>
+                    <Card>
+                        <CardHeader title="子プラン" />
+                        <CardContent>
+                            <ChildPlan
+                                parentPlanId={parentPlan.parentPlanId}
+                                childPlans={childPlans}
+                                setChildPlans={setChildPlans}
+                                autoSave={true}
+                            />
+                        </CardContent>
+                    </Card>
+                </Grid2>
+
+                {/* 操作ボタン */}
+                <Grid2 size={{ xs: 12 }}>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+                        <DetailPageButtonGroups
+                            handleDelete={() => handleDelete(parentPlan.parentPlanId)}
+                            handleDuplicate={() => handleDuplicate(parentPlan.parentPlanId)}
+                        />
+                    </Box>
+                </Grid2>
+            </Grid2>
+        </Box>
     );
 };
 

@@ -218,12 +218,7 @@
   - プラン詳細ページのUI修正
   - ダッシュボードのUI修正
 - 前回
-  - プラン一覧ページのUI修正
-  - サムネ画像の実装（AWS S3）⭐️
-    - ImageUploadService.ts作成
-    - ImageUploader.tsx作成
-    - PlanDetail.tsx調整
-    - plan一覧ページで画像の反映
+  - 
 - それより前
   - 子プランも認証ありに変更
   - ヘッダー
@@ -234,3 +229,11 @@
   - AWS IAMユーザー作成
   - AWS S3バケット作成
   - S3関連のコード実装（s3Client, s3Service）
+    - プラン詳細ページのUI修正
+  - プラン一覧ページのUI修正
+  - サムネ画像の実装（AWS S3）⭐️
+    - ImageUploadService.ts作成
+    - ImageUploader.tsx作成
+    - PlanDetail.tsx調整
+    - plan一覧ページで画像の反映
+  - プラン詳細ページのUI修正
