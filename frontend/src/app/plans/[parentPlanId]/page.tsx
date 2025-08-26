@@ -10,8 +10,6 @@ import { ChildPlanType, ParentPlan } from "@/types/type";
 const PlanDetailPage = ({ params }: { params: Promise<{ parentPlanId: string }> }) => {
     const [parentPlan, setParentPlan] = useState<ParentPlan>();
     const [childPlans, setChildPlans] = useState<ChildPlanType[]>([]);
-    const [file, setFile] = useState<File | null>(null);
-    const [imageURL, setImageURL] = useState<string | null>(null);
     const { parentPlanId } = use(params);
 
     useEffect(() => {
@@ -43,9 +41,6 @@ const PlanDetailPage = ({ params }: { params: Promise<{ parentPlanId: string }> 
                     parentPlan={parentPlan}
                     childPlans={childPlans}
                     setChildPlans={setChildPlans}
-                    setFile={setFile}
-                    imageURL={imageURL}
-                    setImageURL={setImageURL}
                 />
             )}
         </Container>

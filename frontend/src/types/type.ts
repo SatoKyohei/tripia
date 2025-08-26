@@ -4,7 +4,7 @@ export type PlanStatus = "Draft" | "Published";
 export type ParentPlan = {
     parentPlanId: string;
     userId: string;
-    conceptName: string;
+    conceptId: string;
     planName: string;
     planThumbnail: string | null;
     startAreaId: string;

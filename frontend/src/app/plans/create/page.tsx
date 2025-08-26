@@ -1,8 +1,13 @@
 "use client";
 import {
     Box,
+    Card,
+    CardContent,
+    CardHeader,
     Container,
+    Divider,
     FormControlLabel,
+    Grid2,
     Stack,
     Switch,
     TextField,
@@ -20,6 +25,8 @@ import DraftButton from "@/components/elements/Button/DraftButton";
 import CancelButton from "@/components/elements/Button/CancelButton";
 import BasicConceptSelect from "@/components/elements/ConceptSelect/Basic/BasicConceptSelect";
 import { ChildPlanType } from "@/types/type";
+import ImageUploader from "@/components/elements/ImageUploader/ImageUploader";
+import { uploadImage } from "@/services/uploadImage";
 
 // 課題：createページじゃなくてモーダルで表現した方がカッコいいかも？
 // 課題：作成中にやっぱ手動作成に変えたいってなった時、情報が保持されるようにする
@@ -36,9 +43,10 @@ const concepts = [
 ];
 
 const CreatePlanPage = () => {
-    const [value, setValue] = useState(0);
     const [count, setCount] = useState(1);
     const [isAutoCreatePlan, setIsAutoCreatePlan] = useState<boolean>(true);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imageURL, setImageURL] = useState<string | null>(null);
     const [parentPlan, setParentPlan] = useState({
         planName: "",
         planThumbnail: "",
@@ -109,8 +117,17 @@ const CreatePlanPage = () => {
 
     const handleSaveAll = async (status: "Draft" | "Published") => {
         try {
+            // Step1: まず親プランをDBに保存してIDを取得
             const parentPlanId = await saveParentPlan(status);
+
+            // Step2: 画像が選択されていればアップロード
+            if (imageFile) {
+                await uploadImage({ parentPlanId, file: imageFile });
+            }
+
+            // Step3: 子プラン保存
             await saveChildPlans(parentPlanId);
+
             alert("保存しました");
             router.push("/plans");
         } catch (error) {
@@ -120,90 +137,150 @@ const CreatePlanPage = () => {
     };
 
     return (
-        <Container sx={{ mt: 5 }}>
-            <Box component="form">
-                <Stack spacing={3}>
-                    <ImageUploadButton />
-                    <TextField
-                        required
-                        label="プラン名"
-                        onChange={(e) => {
-                            setParentPlan({ ...parentPlan, planName: e.target.value });
-                        }}
-                    />
-                    <DateTimePickerGroups
-                        onStartDateTimeChange={(value) =>
-                            setParentPlan((prev) => ({ ...prev, startDateTime: value || "" }))
-                        }
-                        onEndDateTimeChange={(value) =>
-                            setParentPlan((prev) => ({ ...prev, endDateTime: value || "" }))
-                        }
-                    />
-                    <LocationSelectGroups
-                        startAreaId={parentPlan.startAreaId}
-                        endAreaId={parentPlan.endAreaId}
-                        onLocalChange={(key, value) => {
-                            setParentPlan((prev) => ({ ...prev, [key]: value }));
-                        }}
-                    />
-                    <BasicConceptSelect
-                        onChange={(value) => {
-                            setParentPlan({ ...parentPlan, conceptId: value });
-                        }}
-                    />
-                    <TextField
-                        required
-                        label="旅行の目的"
-                        onChange={(e) => {
-                            setParentPlan({ ...parentPlan, purpose: e.target.value });
-                        }}
-                    />
-                    {isAutoCreatePlan ? (
-                        <>
-                            <TextField label="目的地の数" value={count} onChange={handleOnChange} />
-                            <CountIconButtonGroups
-                                handleCountUp={handleCountUp}
-                                handleCountDown={handleCountDown}
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={isAutoCreatePlan}
-                                        onChange={(e) => setIsAutoCreatePlan(e.target.checked)}
-                                    />
+        <Box sx={{ p: 4 }}>
+            <Grid2 container spacing={4} alignItems="stretch">
+                {/* 左カラム：プラン概要 */}
+                <Grid2 size={{ xs: 12, md: 6 }}>
+                    <Card sx={{ height: "100%" }}>
+                        <CardHeader title="プラン概要" />
+                        <CardContent>
+                            {/* プラン名 */}
+                            <TextField
+                                fullWidth
+                                label="タイトル"
+                                value={parentPlan.planName}
+                                onChange={(e) =>
+                                    setParentPlan({ ...parentPlan, planName: e.target.value })
                                 }
-                                label="プランを自動生成する"
+                                sx={{ mb: 2 }}
                             />
-                        </>
-                    ) : (
-                        <>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={isAutoCreatePlan}
-                                        onChange={(e) => setIsAutoCreatePlan(e.target.checked)}
-                                    />
-                                }
-                                label="プランを自動生成する"
-                            />
-                            <Typography color="primary" component="h2" variant="h5">
-                                子プラン
+
+                            {/* 概要画像 */}
+                            <Divider sx={{ my: 3 }} />
+                            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                                サムネイル画像
                             </Typography>
-                            <ChildPlan
-                                childPlans={childPlans}
-                                setChildPlans={setChildPlans}
-                                autoSave={false}
+                            {/* <ImageUploadButton /> */}
+                            <ImageUploader
+                                imageURL={imageURL}
+                                setImageURL={setImageURL}
+                                autoUpload={false}
+                                onFileSelect={(file) => setImageFile(file)}
                             />
-                        </>
-                    )}
-                </Stack>
-            </Box>
-            <Stack direction="row" spacing={2} sx={{ m: 3 }}>
-                <CreateButton handleClick={() => handleSaveAll("Published")} />
-                <DraftButton handleClick={() => handleSaveAll("Draft")} />
-                <CancelButton />
-            </Stack>
-        </Container>
+
+                            {/* 旅行目的 */}
+                            <Divider sx={{ my: 3 }} />
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={3}
+                                label="旅行の目的"
+                                value={parentPlan.purpose}
+                                onChange={(e) =>
+                                    setParentPlan({ ...parentPlan, purpose: e.target.value })
+                                }
+                            />
+
+                            {/* コンセプト選択 */}
+                            <Divider sx={{ my: 3 }} />
+                            <BasicConceptSelect
+                                onChange={(value) => {
+                                    setParentPlan({ ...parentPlan, conceptId: value });
+                                }}
+                            />
+                        </CardContent>
+                    </Card>
+                </Grid2>
+
+                {/* 右カラム：場所と時間 */}
+                <Grid2 size={{ xs: 12, md: 6 }}>
+                    <Card sx={{ height: "100%" }}>
+                        <CardHeader title="場所と時間" />
+                        <CardContent>
+                            {/* 場所選択 */}
+                            <LocationSelectGroups
+                                startAreaId={parentPlan.startAreaId}
+                                endAreaId={parentPlan.endAreaId}
+                                onLocalChange={(key, value) => {
+                                    setParentPlan((prev) => ({ ...prev, [key]: value }));
+                                }}
+                            />
+
+                            {/* 日時 */}
+                            <Divider sx={{ my: 3 }} />
+                            <DateTimePickerGroups
+                                onStartDateTimeChange={(value) =>
+                                    setParentPlan((prev) => ({
+                                        ...prev,
+                                        startDateTime: value || "",
+                                    }))
+                                }
+                                onEndDateTimeChange={(value) =>
+                                    setParentPlan((prev) => ({ ...prev, endDateTime: value || "" }))
+                                }
+                            />
+
+                            {/* 自動生成の切り替え */}
+                            <Divider sx={{ my: 3 }} />
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={isAutoCreatePlan}
+                                        onChange={(e) => setIsAutoCreatePlan(e.target.checked)}
+                                    />
+                                }
+                                label="プランを自動生成する"
+                            />
+                            {isAutoCreatePlan && (
+                                <Stack
+                                    direction="row"
+                                    spacing={2}
+                                    sx={{ mt: 2 }}
+                                    alignItems="center"
+                                >
+                                    <TextField
+                                        label="目的地の数"
+                                        value={count}
+                                        onChange={handleOnChange}
+                                        inputProps={{ readOnly: true }}
+                                        sx={{ width: 120 }}
+                                    />
+                                    <CountIconButtonGroups
+                                        handleCountUp={handleCountUp}
+                                        handleCountDown={handleCountDown}
+                                    />
+                                </Stack>
+                            )}
+                        </CardContent>
+                    </Card>
+                </Grid2>
+
+                {/* 子プランセクション */}
+                {!isAutoCreatePlan && (
+                    <Grid2 size={{ xs: 12 }}>
+                        <Card>
+                            <CardHeader title="子プラン" />
+                            <CardContent>
+                                <ChildPlan
+                                    childPlans={childPlans}
+                                    setChildPlans={setChildPlans}
+                                    autoSave={false}
+                                />
+                            </CardContent>
+                        </Card>
+                    </Grid2>
+                )}
+
+                {/* 操作ボタン */}
+                <Grid2 size={{ xs: 12 }}>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+                        <CreateButton handleClick={() => handleSaveAll("Published")} />
+                        <DraftButton handleClick={() => handleSaveAll("Draft")} />
+                        <CancelButton />
+                    </Box>
+                </Grid2>
+            </Grid2>
+        </Box>
     );
 };
 

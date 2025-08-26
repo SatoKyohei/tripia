@@ -1,15 +1,24 @@
 "use client";
-import { Button, Stack, TextField, Typography } from "@mui/material";
-import Image from "next/image";
+import {
+    Avatar,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Divider,
+    Grid2,
+    Stack,
+    TextField,
+    Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 
-// 課題：各<Typography>の位置関係が揃ってない
-// 課題：変更するを押したら<TextField>になり、変更できるようになる
 
 const DashboardPage = () => {
     const [thumbnail, setThumbnail] = useState("");
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
+    const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem("access_token");
@@ -40,31 +49,95 @@ const DashboardPage = () => {
     }, []);
 
     return (
-        <Stack
-            spacing={2}
-            alignItems="center"
-            sx={{
-                maxWidth: "400px",
-                margin: "0 auto",
-                padding: "30px 0",
-                borderRadius: "4px",
-                boxShadow: "0px 5px 15px 0px rgba(0, 0, 0, 0.35)",
-                marginTop: 5,
-            }}
-        >
-            <Image src="/profile.png" alt="profile" width={100} height={100} />
+        <Box sx={{ p: 4, maxWidth: "900px", margin: "0 auto" }}>
+            <Stack spacing={3} alignItems="center">
 
-            <Typography variant="body1" component="div">
-                ユーザー名：
-                <TextField variant="standard" size="small" value={name} />
-            </Typography>
-            <Typography variant="body1" component="div">
-                Email：
-                <TextField variant="standard" size="small" value={email} />
-            </Typography>
-            <Button variant="contained">変更する</Button>
-        </Stack>
+                {/* プロフィール */}
+                <Avatar src={thumbnail} alt="profile" sx={{ width: 120, height: 120, mb: 1 }} />
+                <Typography variant="h5" component="div">
+                    {name}
+                </Typography>
+
+                <Grid2 container spacing={3}>
+
+                    {/* ユーザー情報カード */}
+                    <Grid2 size={{ xs: 12, md: 6 }}>
+                        <Card sx={{ p: 2 }}>
+                            <CardContent>
+                                <Typography variant="h6" gutterBottom>
+                                    ユーザー情報
+                                </Typography>
+                                <Divider sx={{ mb: 2 }} />
+                                <Stack spacing={2}>
+                                    <TextField
+                                        label="ユーザー名"
+                                        variant="outlined"
+                                        size="small"
+                                        value={name}
+                                        disabled={!isEditing}
+                                        onChange={(e) => setName(e.target.value)}
+                                    />
+                                    <TextField
+                                        label="Email"
+                                        variant="outlined"
+                                        size="small"
+                                        value={email}
+                                        disabled={!isEditing}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => setIsEditing((prev) => !prev)}
+                                    >
+                                        {isEditing ? "保存" : "変更する"}
+                                    </Button>
+                                </Stack>
+                            </CardContent>
+                        </Card>
+                    </Grid2>
+
+                    {/* ユーザー統計カード */}
+                    <Grid2 size={{ xs: 12, md: 6 }}>
+                        <Card sx={{ p: 2 }}>
+                            <CardContent>
+                                <Typography variant="h6" gutterBottom>
+                                    アクティビティ
+                                </Typography>
+                                <Divider sx={{ mb: 2 }} />
+                                <Stack spacing={2}>
+                                    <Typography variant="body1">作成したプラン数：5</Typography>
+                                    <Typography variant="body1">参加予定のプラン：2</Typography>
+                                    <Typography variant="body1">お気に入りの場所：3</Typography>
+                                    <Button variant="outlined">もっと見る</Button>
+                                </Stack>
+                            </CardContent>
+                        </Card>
+                    </Grid2>
+
+                    {/* オプションカード例 */}
+                    <Grid2 size={{ xs: 12, md: 6 }}>
+                        <Card sx={{ p: 2 }}>
+                            <CardContent>
+                                <Typography variant="h6" gutterBottom>
+                                    アカウント操作
+                                </Typography>
+                                <Divider sx={{ mb: 2 }} />
+                                <Stack direction="row" spacing={2}>
+                                    <Button variant="contained" color="error">
+                                        ログアウト
+                                    </Button>
+                                    <Button variant="outlined" color="secondary">
+                                        アカウント削除
+                                    </Button>
+                                </Stack>
+                            </CardContent>
+                        </Card>
+                    </Grid2>
+                </Grid2>
+            </Stack>
+        </Box>
     );
 };
 
 export default DashboardPage;
+

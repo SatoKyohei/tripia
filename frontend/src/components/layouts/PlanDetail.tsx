@@ -6,13 +6,11 @@ import {
     CardHeader,
     Divider,
     Grid2,
-    Stack,
     TextField,
     Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import DateTimePickerGroups from "@/components/elements/DateTimePicker/DateTimePickerGroups";
 import LocationSelectGroups from "@/components/elements/LocationSelect/LocationSelectGroups";
 import ChildPlan from "@/components/layouts/ChildPlan";
@@ -21,6 +19,7 @@ import DetailPageButtonGroups from "@/components/elements/Button/DetailPageButto
 import { getPrefectureIdByAreaId } from "@/data/locationMaster";
 import BasicStatusSelect from "@/components/elements/StatusSelect/Basic/BasicStatusSelect";
 import ImageUploader from "@/components/elements/ImageUploader/ImageUploader";
+import BasicConceptSelect from "@/components/elements/ConceptSelect/Basic/BasicConceptSelect";
 
 // 課題：DetailPageButtonGroups ⇨ EditButtonにpropsを受け渡している。冗長な気がする。
 // 課題：ChildPlan.tsxに定義しているhandleChangeをDateTimePickerGroupsに指定。ただ、グローバルの状態管理した方がいいかも
@@ -29,20 +28,11 @@ type PlanDetailProps = {
     parentPlan: ParentPlan;
     childPlans: ChildPlanType[];
     setChildPlans: React.Dispatch<React.SetStateAction<ChildPlanType[]>>;
-    setFile: (file: File | null) => void;
-    imageURL: string | null;
-    setImageURL: (image: string | null) => void;
 };
 
-const PlanDetail = ({
-    parentPlan,
-    childPlans,
-    setChildPlans,
-    setFile,
-    imageURL,
-    setImageURL,
-}: PlanDetailProps) => {
+const PlanDetail = ({ parentPlan, childPlans, setChildPlans }: PlanDetailProps) => {
     const [plan, setPlan] = useState<ParentPlan>(parentPlan);
+    const [imageURL, setImageURL] = useState<string | null>(null);
     const router = useRouter();
     const token = localStorage.getItem("access_token");
     const startPrefectureId = getPrefectureIdByAreaId(plan.startAreaId);
@@ -118,7 +108,6 @@ const PlanDetail = ({
     return (
         <Box sx={{ p: 4 }}>
             <Grid2 container spacing={4}>
-                
                 {/* 左カラム */}
                 <Grid2 size={{ xs: 12, md: 6 }}>
                     <Card>
@@ -143,9 +132,9 @@ const PlanDetail = ({
                             </Typography>
                             <ImageUploader
                                 parentPlanId={parentPlan.parentPlanId}
-                                setFile={setFile}
                                 imageURL={imageURL}
                                 setImageURL={setImageURL}
+                                autoUpload={true}
                             />
                             <Divider sx={{ my: 3 }} />
                             <TextField
@@ -158,13 +147,20 @@ const PlanDetail = ({
                                     handleChange(plan.parentPlanId, "purpose", e.target.value)
                                 }
                             />
+                            <Divider sx={{ my: 3 }} />
+                            <BasicConceptSelect
+                                conceptId={plan.conceptId}
+                                onChange={(value) => {
+                                    handleChange(plan.parentPlanId, "conceptId", value);
+                                }}
+                            />
                         </CardContent>
                     </Card>
                 </Grid2>
 
                 {/* 右カラム */}
                 <Grid2 size={{ xs: 12, md: 6 }}>
-                    <Card>
+                    <Card sx={{ height: "100%" }}>
                         <CardHeader title="場所と時間" />
                         <CardContent>
                             <LocationSelectGroups

@@ -7,6 +7,7 @@ type BasicConceptSelectProps = {
     conceptId?: string | null | undefined;
     onChange: (value: string) => void;
 };
+
 const options = conceptList;
 
 const BasicConceptSelect = (props: BasicConceptSelectProps) => {
