@@ -13,6 +13,7 @@ import {
     Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import BasicIconButton from "@/components/elements/IconButton/Basic/BasicIconButton";
 import BasicMenu from "@/components/elements/Menu/Basic/BasicMenu";
@@ -31,6 +32,7 @@ const Header = () => {
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
     const [mounted, setMounted] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
         setMounted(true);
@@ -64,6 +66,7 @@ const Header = () => {
             onClick: () => {
                 localStorage.removeItem("access_token");
                 window.dispatchEvent(new Event("tripia:auth-changed"));
+                router.replace("/");
             },
         },
     ];
