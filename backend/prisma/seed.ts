@@ -1,6 +1,6 @@
 import { PlanStatus } from "@prisma/client";
-import { prisma } from "../src/lib/PrismaClient";
 import bcrypt from "bcryptjs";
+import prisma from "../src/lib/PrismaClient";
 
 async function main() {
     // User

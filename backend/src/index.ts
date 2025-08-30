@@ -5,18 +5,19 @@ import express, {
     urlencoded,
     NextFunction,
 } from "express";
-import { RegisterRoutes } from "../build/routes";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import { ValidateError } from "tsoa";
 import cookieParser from "cookie-parser";
 
-export const tokenBlacklist = new Set();
+import { RegisterRoutes } from "../build/routes";
+import { HTTP_STATUS } from "./types/httpStatusTypes";
 
 const app = express();
+const DEFAULT_PORT = 8080;
 
 app.get("/", (req, res) => {
-    res.status(200).json({ message: "health check OK" });
+    res.status(HTTP_STATUS.OK).json({ message: "health check OK" });
 });
 
 app.use(urlencoded({ extended: true }));
@@ -33,7 +34,7 @@ RegisterRoutes(app);
 
 app.use(((err: unknown, _req: ExRequest, res: ExResponse, next: NextFunction) => {
     if (err instanceof ValidateError) {
-        return res.status(422).json({
+        return res.status(HTTP_STATUS.UNPROCESSABLE_ENTITY).json({
             message: "Validation Failed",
             details: err?.fields,
         });
@@ -41,7 +42,7 @@ app.use(((err: unknown, _req: ExRequest, res: ExResponse, next: NextFunction) =>
 
     if (err instanceof Error) {
         console.error(err);
-        return res.status(500).json({
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             message: err.message || "Internal Server Error",
         });
     }
@@ -49,5 +50,5 @@ app.use(((err: unknown, _req: ExRequest, res: ExResponse, next: NextFunction) =>
     next();
 }) as express.ErrorRequestHandler);
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || DEFAULT_PORT;
 app.listen(port);

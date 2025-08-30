@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { tokenBlacklist } from "..";
 import jwt from "jsonwebtoken";
+
 import { SECRET_KEY } from "../config";
+import { tokenBlacklist } from "../lib/TokenBlackList";
+import { HTTP_STATUS } from "../types/httpStatusTypes";
 
 export interface AuthenticateRequest extends Request {
     user?: { userId: string };
@@ -12,19 +14,19 @@ export const authenticateToken = (req: AuthenticateRequest, res: Response, next:
     const token = authHeader && authHeader.split(" ")[1];
 
     if (!token) {
-        return res.status(401).json({ error: "Access token required" });
+        return res.status(HTTP_STATUS.UNAUTHORIZED).json({ error: "Access token required" });
     }
 
     if (tokenBlacklist.has(token)) {
-        return res.status(403).json({ error: "Token is no longer valid" });
+        return res.status(HTTP_STATUS.FORBIDDEN).json({ error: "Token is no longer valid" });
     }
 
     jwt.verify(token, SECRET_KEY, (err, user) => {
         if (err) {
             if (err.name === "TokenExpiredError") {
-                return res.status(401).json({ error: "Token expired" });
+                return res.status(HTTP_STATUS.UNAUTHORIZED).json({ error: "Token expired" });
             }
-            return res.status(403).json({ error: "Invalid token" });
+            return res.status(HTTP_STATUS.FORBIDDEN).json({ error: "Invalid token" });
         }
 
         req.user = user as { userId: string };

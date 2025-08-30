@@ -1,28 +1,31 @@
 import { Controller, FormField, Post, Response, Route, UploadedFile } from "tsoa";
-import { ValidateErrorJSON } from "../types/types";
-import { uploadImageToS3 } from "../services/s3Service";
-import { savePlanImage } from "../services/planService";
+
+import { ValidateErrorJSON } from "../types/validationTypes";
+import { uploadImageAndSave } from "../services/uploadService";
+import { HTTP_STATUS } from "../types/httpStatusTypes";
 
 @Route("upload")
 export class UploadController extends Controller {
     // AWS S3へのアップロード
-    @Response<ValidateErrorJSON>(404, "User Not Found")
+    @Response<ValidateErrorJSON>(HTTP_STATUS.NOT_FOUND, "User Not Found")
     @Post()
     public async uploadImage(
         @UploadedFile() file: Express.Multer.File,
         @FormField() parentPlanId: string,
-    ) {
+    ): Promise<{ url: string } | { error: string }> {
         if (!file) {
-            this.setStatus(400);
+            this.setStatus(HTTP_STATUS.BAD_REQUEST);
             return { error: "No file uploaded" };
         }
 
-        // S3にアップデート
-        const url = await uploadImageToS3(file);
-
-        // DBにURL保存
-        await savePlanImage(parentPlanId, url);
-
-        return { url };
+        try {
+            const url = await uploadImageAndSave(file, parentPlanId);
+            this.setStatus(HTTP_STATUS.OK);
+            return { url };
+        } catch (error) {
+            console.error(error);
+            this.setStatus(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+            return { error: (error as Error).message };
+        }
     }
 }

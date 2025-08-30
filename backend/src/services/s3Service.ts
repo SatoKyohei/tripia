@@ -1,10 +1,14 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
+import dotenv from "dotenv";
+
 import { s3 } from "../lib/s3Client";
+
+dotenv.config();
 
 const BUCKET_NAME = process.env.S3_BUCKET_NAME!;
 
-export async function uploadImageToS3(file: Express.Multer.File) {
+export async function uploadImageToS3(file: Express.Multer.File): Promise<string> {
     const key = `uploads/${uuidv4()}-${file.originalname}`;
     await s3.send(
         new PutObjectCommand({

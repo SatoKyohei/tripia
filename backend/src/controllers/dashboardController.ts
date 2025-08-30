@@ -1,36 +1,33 @@
-import { PrismaClient, User } from "@prisma/client";
 import { Controller, Get, Request, Response, Route, Security } from "tsoa";
-import { ValidateErrorJSON } from "../types/types";
-import { AuthenticateRequest } from "../middleware/authenticate";
+import { User } from "@prisma/client";
 
-const prisma = new PrismaClient();
+import { ValidateErrorJSON } from "../types/validationTypes";
+import { AuthenticateRequest } from "../middleware/authenticate";
+import { getUserProfile } from "../services/dashboardService";
+import { HTTP_STATUS } from "../types/httpStatusTypes";
 
 @Route("dashboard")
 @Security("jwt")
 export class DashboardController extends Controller {
-    @Response<ValidateErrorJSON>(404, "User Not Found")
+    @Response<ValidateErrorJSON>(HTTP_STATUS.NOT_FOUND, "User Not Found")
     @Get()
     public async getProfile(
         @Request() req: AuthenticateRequest,
     ): Promise<User | { message: string }> {
         try {
             const userId = req.user?.userId;
-            const user = await prisma.user.findUnique({
-                where: {
-                    userId,
-                },
-            });
-
-            if (!user) {
-                this.setStatus(404);
-                throw new Error("ユーザーが存在しません");
+            if (!userId) {
+                this.setStatus(HTTP_STATUS.BAD_REQUEST);
+                throw new Error("ユーザーIDが提供されていません");
             }
 
-            this.setStatus(200);
+            const user = await getUserProfile(userId);
+
+            this.setStatus(HTTP_STATUS.OK);
             return user;
         } catch (error) {
             console.error(error);
-            this.setStatus(500);
+            this.setStatus(HTTP_STATUS.INTERNAL_SERVER_ERROR);
             throw new Error("ユーザー取得に失敗しました");
         }
     }

@@ -27,6 +27,7 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
             checkInTime: null,
             checkOutTime: null,
             memo: "",
+            userId: "default-user-id", // Provide a default value if userId is missing
         };
 
         setChildPlans((prev) => [...prev, newTempPlan]);
@@ -37,22 +38,33 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
 
         const { childPlanId, ...planDataForAPI } = newTempPlan;
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/create`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(planDataForAPI),
-            // credentials: "include",
-        });
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/create`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(planDataForAPI),
+                },
+            );
 
-        const responseData = await response.json();
-        const { newChildPlan } = responseData;
+            if (!response.ok) {
+                console.error("Failed to create child plan");
+                return;
+            }
 
-        setChildPlans((prev) =>
-            prev.map((plan) => (plan.childPlanId === tempId ? newChildPlan : plan)),
-        );
+            const responseData = await response.json();
+            const { newChildPlan } = responseData;
+
+            setChildPlans((prev) =>
+                prev.map((plan) => (plan.childPlanId === tempId ? newChildPlan : plan)),
+            );
+        } catch (error) {
+            console.error("Error during child plan creation:", error);
+        }
     };
 
     const handleChange = async (childPlanId: string, key: keyof ChildPlanType, value: string) => {
@@ -60,29 +72,38 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
             const updatedPlans = prev.map((plan) =>
                 plan.childPlanId === childPlanId ? { ...plan, [key]: value } : plan,
             );
-
-            if (autoSave) {
-                const tempPlan = updatedPlans.find((plan) => plan.childPlanId === childPlanId);
-                const { createdAt, updatedAt, userId, ...targetPlan } = tempPlan;
-
-                fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/update`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify(targetPlan),
-                    // credentials: "include",
-                }).then((response) => {
-                    if (!response.ok) {
-                        console.error("Failed to save child plan");
-                        return;
-                    }
-                });
-            }
-
             return updatedPlans;
         });
+
+        if (autoSave) {
+            const tempPlan = childPlans?.find((plan) => plan.childPlanId === childPlanId);
+            if (!tempPlan) {
+                console.error("Target plan not found");
+                return;
+            }
+
+            const {createdAt, updatedAt, ...targetPlan} = tempPlan;
+
+            try {
+                const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/update`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ ...targetPlan, [key]: value }),
+                    },
+                );
+
+                if (!response.ok) {
+                    console.error("Failed to update child plan");
+                }
+            } catch (error) {
+                console.error("Error during child plan update:", error);
+            }
+        }
     };
 
     const handleDelete = async (childPlanId: string) => {

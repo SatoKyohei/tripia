@@ -1,12 +1,13 @@
-import { PrismaClient, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { Body, Controller, Get, Path, Post, Response, Route } from "tsoa";
-import { ValidateErrorJSON } from "../types/types";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { SECRET_KEY } from "../config";
-import { tokenBlacklist } from "..";
 
-const prisma = new PrismaClient();
+import { ValidateErrorJSON } from "../types/validationTypes";
+import { createUser, authenticateUser } from "../services/userService";
+
+import { HTTP_STATUS } from "../types/httpStatusTypes";
+
+import prisma from "../lib/PrismaClient";
+import { tokenBlacklist } from "../lib/TokenBlackList";
 
 type UserCreationParams = Pick<User, "email" | "name" | "password">;
 type LoginParams = Pick<User, "email" | "password">;
@@ -14,7 +15,7 @@ type LoginParams = Pick<User, "email" | "password">;
 @Route("users")
 export class UsersController extends Controller {
     // ユーザー情報の取得
-    @Response<ValidateErrorJSON>(404, "User Not Found")
+    @Response<ValidateErrorJSON>(HTTP_STATUS.NOT_FOUND, "User Not Found")
     @Get("{userId}")
     public async getUser(@Path() userId: string): Promise<User | null> {
         return await prisma.user.findUnique({
@@ -23,84 +24,39 @@ export class UsersController extends Controller {
     }
 
     // 新規ユーザー登録
-    @Response<ValidateErrorJSON>(422, "Validation Failed")
-    @Response<ValidateErrorJSON>(409, "Conflict")
+    @Response<ValidateErrorJSON>(HTTP_STATUS.UNPROCESSABLE_ENTITY, "Validation Failed")
+    @Response<ValidateErrorJSON>(HTTP_STATUS.CONFLICT, "Conflict")
     @Post("register")
     public async createUser(
         @Body() requestBody: UserCreationParams,
     ): Promise<{ message: string; details?: any } | void> {
-        const { email, name, password } = requestBody;
-
-        // ユーザーが作成済みかどうかチェック
-        const existingUser = await prisma.user.findUnique({
-            where: {
-                email,
-            },
-        });
-
-        if (existingUser) {
-            this.setStatus(409);
-            return {
-                message: "メールアドレスは既に存在します",
-                details: { email: "このメールアドレスは既に登録されています。" },
-            };
-        }
-
-        // パスワードをハッシュ化し、ユーザー作成
         try {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            await prisma.user.create({
-                data: {
-                    name,
-                    email,
-                    password: hashedPassword,
-                },
-            });
-            this.setStatus(201);
-            return { message: "ユーザーの作成に成功しました" };
+            const user = await createUser(requestBody);
+            this.setStatus(HTTP_STATUS.CREATED);
+            return { message: "ユーザーが作成されました", details: user };
         } catch (error) {
             console.error(error);
-            this.setStatus(500);
-            return { message: "ユーザーの作成に失敗しました" };
+            this.setStatus(HTTP_STATUS.CONFLICT);
+            return { message: (error as Error).message };
         }
     }
 
     // ログイン
-    @Response<ValidateErrorJSON>(404, "User Not Found")
-    @Response<ValidateErrorJSON>(401, "Invalid Password")
+    @Response<ValidateErrorJSON>(HTTP_STATUS.NOT_FOUND, "User Not Found")
+    @Response<ValidateErrorJSON>(HTTP_STATUS.UNAUTHORIZED, "Invalid Password")
     @Post("login")
-    public async loginUser(
+    public async login(
         @Body() requestBody: LoginParams,
-    ): Promise<{ token?: string; userId?: string; message?: string } | null> {
-        const { email, password } = requestBody;
-
-        // ユーザー情報取得・存在チェック
-        const user = await prisma.user.findUnique({
-            where: {
-                email,
-            },
-        });
-
-        if (!user) {
-            this.setStatus(404);
-            return { message: "ユーザーが見つかりません" };
+    ): Promise<{ token: string } | { message?: string }> {
+        try {
+            const token = await authenticateUser(requestBody);
+            this.setStatus(HTTP_STATUS.OK);
+            return { token };
+        } catch (error) {
+            console.error(error);
+            this.setStatus(HTTP_STATUS.UNAUTHORIZED);
+            return { message: (error as Error).message };
         }
-
-        // パスワード照合・妥当性チェック
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        if (!isPasswordValid) {
-            this.setStatus(401);
-            return { message: "無効なパスワードです" };
-        }
-
-        // トークン生成
-        const token = jwt.sign({ userId: user.userId }, SECRET_KEY, {
-            expiresIn: "1h",
-        });
-
-        this.setStatus(200);
-        return { token, userId: user.userId };
     }
 
     // ログアウト
@@ -112,10 +68,10 @@ export class UsersController extends Controller {
 
         if (token) {
             tokenBlacklist.add(token);
-            this.setStatus(200);
+            this.setStatus(HTTP_STATUS.OK);
             return;
         }
-        this.setStatus(400);
+        this.setStatus(HTTP_STATUS.BAD_REQUEST);
         return { message: "トークンが提供されていません" };
     }
 }

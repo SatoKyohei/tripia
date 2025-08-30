@@ -63,6 +63,7 @@ export type ChildPlanType = {
     checkInTime: string | null;
     checkOutTime: string | null;
     memo: string | null;
+    userId: string;
 };
 
 export type PlanWithChildren = {
