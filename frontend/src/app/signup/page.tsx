@@ -1,7 +1,9 @@
 "use client";
-import { Button, Divider, Stack, TextField, Typography } from "@mui/material";
+import React from "react";
+import { Divider, Stack, TextField, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Button from "@/components/elements/Button/Button"; // Replace Material UI Button
 
 // 課題：Googleアイコンがない
 // 課題：<Button></Button>要素で囲むと大文字になる
@@ -78,13 +80,17 @@ const SignUpPage = () => {
                 type="password"
                 sx={{ width: "80%" }}
             />
-            <Button variant="contained" onClick={handleSignUp} sx={{ width: "80%" }}>
-                Sign Up
-            </Button>
+            <Button
+                label="Sign Up"
+                variant="contained"
+                onClick={handleSignUp}
+                sx={{ width: "80%" }}
+            />
             <Divider>
                 <Typography sx={{ color: "text.secondary" }}>or</Typography>
             </Divider>
             <Button
+                label="Sign Up With Google"
                 variant="contained"
                 sx={{
                     width: "80%",
@@ -95,9 +101,7 @@ const SignUpPage = () => {
                     padding: "10px 0",
                     fontWeight: "normal",
                 }}
-            >
-                Sign Up With Google
-            </Button>
+            />
         </Stack>
     );
 };

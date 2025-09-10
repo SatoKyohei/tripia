@@ -1,22 +1,11 @@
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import BasicIconButton from "@/components/elements/IconButton/Basic/BasicIconButton";
+import IconButton from "@/components/elements/IconButton/IconButton";
 
-// 課題：レイアウトを修正
-// 課題：直接手入力がうまくいかないわけではないが使いづらい
-
-type CountDownIconButtonProps = {
-    handleCountDown: () => void;
-};
-
-const CountDownIconButton = (props: CountDownIconButtonProps) => {
-    const { handleCountDown } = props;
-
+const CountDownIconButton = (props: { handleCountDown: () => void }) => {
     return (
-        <>
-            <BasicIconButton onClick={handleCountDown}>
-                <RemoveCircleIcon />
-            </BasicIconButton>
-        </>
+        <IconButton color="default" onClick={props.handleCountDown} size="medium">
+            <RemoveCircleIcon />
+        </IconButton>
     );
 };
 

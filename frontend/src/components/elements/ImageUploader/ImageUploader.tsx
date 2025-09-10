@@ -3,12 +3,13 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { Box } from "@mui/material";
 import { uploadImage } from "@/services/uploadImage";
+import Button from "@/components/elements/Button/Button";
 
 type ImageUploaderProps = {
     parentPlanId?: string;
     imageURL: string | null;
     setImageURL: (value: string | null) => void;
-    autoUpload: boolean;
+    autoUpload?: boolean;
     onFileSelect?: (file: File) => void;
 };
 
@@ -16,23 +17,22 @@ const ImageUploader = ({
     parentPlanId,
     imageURL,
     setImageURL,
-    autoUpload,
+    autoUpload = false,
     onFileSelect,
 }: ImageUploaderProps) => {
-    const [file, setFile] = useState<File | null>(null);
-
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
         if (!selectedFile) return;
-        setFile(selectedFile);
+
         setImageURL(URL.createObjectURL(selectedFile)); // 一時プレビュー用URL
 
+        // 作成ページ用：即時アップロードしない
         if (!autoUpload) {
             onFileSelect?.(selectedFile);
             return;
         }
 
-        // 詳細ページ：即アップロード
+        // 詳細ページ用：即時アップロード
         if (parentPlanId) {
             const uploadUrl = await uploadImage({ parentPlanId, file: selectedFile });
             if (uploadUrl) setImageURL(uploadUrl);
@@ -41,9 +41,8 @@ const ImageUploader = ({
 
     return (
         <div>
-            <input type="file" onChange={handleChange} accept="image/*" />
             {imageURL && (
-                <Box sx={{ mt: 2 }}>
+                <Box sx={{ mt: 2, mb: 2 }}>
                     <Image
                         src={imageURL}
                         alt="サムネイル画像"
@@ -58,6 +57,10 @@ const ImageUploader = ({
                     />
                 </Box>
             )}
+            <Button variant="contained" component="label">
+                画像をアップロード
+                <input type="file" hidden onChange={handleChange} accept="image/*" />
+            </Button>
         </div>
     );
 };

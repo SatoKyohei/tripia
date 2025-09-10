@@ -1,7 +1,8 @@
 "use client";
 
-import { Box, Button, Card, CardContent, CardMedia, Container, Typography } from "@mui/material";
+import { Box, Card, CardContent, CardMedia, Container, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import Button from "@/components/elements/Button/Button"; // Replace Material UI Button
 
 export default function Home() {
     return (
@@ -23,14 +24,13 @@ export default function Home() {
                         Tripiaで旅のプランを作成・共有して、新しい旅先を見つけよう
                     </Typography>
                     <Button
+                        label="プランを作成"
                         variant="contained"
                         color="secondary"
                         size="large"
                         sx={{ mt: 4 }}
                         href="/plans/create"
-                    >
-                        プランを作成
-                    </Button>
+                    />
                 </Container>
             </Box>
 

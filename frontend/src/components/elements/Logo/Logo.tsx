@@ -1,31 +1,26 @@
-import { Typography } from "@mui/material";
+import { SxProps, Theme, Typography } from "@mui/material";
 import { ElementType } from "react";
 import LocalAirportIcon from "@mui/icons-material/LocalAirport";
 
-type TypographyProps = {
-    variant:
-        | "body1"
-        | "body2"
-        | "button"
-        | "caption"
-        | "h1"
-        | "h2"
-        | "h3"
-        | "h4"
-        | "h5"
-        | "h6"
-        | "inherit"
-        | "overline"
-        | "subtitle1"
-        | "subtitle2";
-    noWrap: boolean;
-    component: ElementType;
-    href: string;
-    logoSx: object;
-    iconSx: object;
+type LogoProps = {
+    variant: React.ComponentProps<typeof Typography>["variant"];
+    noWrap?: boolean;
+    component?: ElementType;
+    href?: string;
+    logoSx: SxProps<Theme>;
+    iconSx: SxProps<Theme>;
+    name: string;
 };
 
-const Logo = ({ variant, noWrap, component, href, logoSx, iconSx }: TypographyProps) => {
+const Logo = ({
+    variant,
+    noWrap = true,
+    component = "a",
+    href = "/",
+    logoSx,
+    iconSx,
+    name,
+}: LogoProps) => {
     return (
         <>
             <LocalAirportIcon sx={iconSx} />
@@ -36,7 +31,7 @@ const Logo = ({ variant, noWrap, component, href, logoSx, iconSx }: TypographyPr
                 href={href}
                 sx={logoSx}
             >
-                LOGO
+                {name}
             </Typography>
         </>
     );

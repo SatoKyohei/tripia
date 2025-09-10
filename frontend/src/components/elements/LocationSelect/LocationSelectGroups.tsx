@@ -2,7 +2,7 @@ import { Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import BasicLocationSelect from "@/components/elements/LocationSelect/Basic/BasicLocationSelect";
 import { ParentPlan } from "@/types/type";
-import { areaList, prefectureList } from "@/data/locationMaster";
+import { areaList, prefectureList } from "@/data/locationList";
 
 // 課題：ラベルはここに定義で本当に良いのか
 const labels = {

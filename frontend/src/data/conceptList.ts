@@ -1,4 +1,5 @@
 export const conceptList = [
+    { conceptId: "default", conceptName: "選択してください" },
     { conceptId: "relax", conceptName: "リラックス" },
     { conceptId: "active", conceptName: "アクティブな旅行" },
     { conceptId: "interaction", conceptName: "現地で交流" },

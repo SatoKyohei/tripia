@@ -4,7 +4,6 @@ import {
     Card,
     CardContent,
     CardHeader,
-    Container,
     Divider,
     FormControlLabel,
     Grid2,
@@ -15,18 +14,17 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import ImageUploadButton from "@/components/elements/Button/ImageUploadButton";
 import DateTimePickerGroups from "@/components/elements/DateTimePicker/DateTimePickerGroups";
 import LocationSelectGroups from "@/components/elements/LocationSelect/LocationSelectGroups";
 import ChildPlan from "@/components/layouts/ChildPlan";
-import CountIconButtonGroups from "@/components/elements/IconButton/CountIconButtonGroups";
-import CreateButton from "@/components/elements/Button/CreateButton";
-import DraftButton from "@/components/elements/Button/DraftButton";
-import CancelButton from "@/components/elements/Button/CancelButton";
-import BasicConceptSelect from "@/components/elements/ConceptSelect/Basic/BasicConceptSelect";
+import Button from "@/components/elements/Button/Button";
 import { ChildPlanType } from "@/types/type";
 import ImageUploader from "@/components/elements/ImageUploader/ImageUploader";
 import { uploadImage } from "@/services/uploadImage";
+import Select from "@/components/elements/Select/Select";
+import { conceptList } from "@/data/conceptList";
+import CountUpIconButton from "@/components/elements/IconButton/CountUpIconButton";
+import CountDownIconButton from "@/components/elements/IconButton/CountDownIconButton";
 
 // 課題：createページじゃなくてモーダルで表現した方がカッコいいかも？
 // 課題：作成中にやっぱ手動作成に変えたいってなった時、情報が保持されるようにする
@@ -34,13 +32,11 @@ import { uploadImage } from "@/services/uploadImage";
 
 // 課題：ここで定義で本当に良いのか
 const labels = { concept: "旅行のコンセプト" };
-const concepts = [
-    { id: 1, name: "リラックス" },
-    { id: 2, name: "アクティブな旅行" },
-    { id: 3, name: "現地で交流" },
-    { id: 4, name: "貧乏旅" },
-    { id: 5, name: "卒業旅行" },
-];
+
+const concepts = conceptList.map((concept) => ({
+    id: concept.conceptId,
+    name: concept.conceptName,
+}));
 
 const CreatePlanPage = () => {
     const [count, setCount] = useState(1);
@@ -101,17 +97,30 @@ const CreatePlanPage = () => {
 
     const saveChildPlans = async (parentPlanId: string) => {
         const token = localStorage.getItem("access_token");
-        const promises = childPlans.map((childPlan, index) =>
-            fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/create`, {
+
+        const promises = childPlans.map((childPlan, index) => {
+            const payload = {
+                childPlanId: childPlan.childPlanId,
+                locationName: childPlan.locationName,
+                checkInTime: childPlan.checkInTime,
+                checkOutTime: childPlan.checkOutTime,
+                memo: childPlan.memo,
+                userId: childPlan.userId,
+                parentPlanId,
+                order: index + 1,
+            };
+
+            return fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/create`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ ...childPlan, parentPlanId, order: index + 1 }),
+                body: JSON.stringify(payload),
                 credentials: "include",
-            }),
-        );
+            });
+        });
+
         await Promise.all(promises);
     };
 
@@ -160,11 +169,9 @@ const CreatePlanPage = () => {
                             <Typography variant="subtitle1" sx={{ mb: 1 }}>
                                 サムネイル画像
                             </Typography>
-                            {/* <ImageUploadButton /> */}
                             <ImageUploader
                                 imageURL={imageURL}
                                 setImageURL={setImageURL}
-                                autoUpload={false}
                                 onFileSelect={(file) => setImageFile(file)}
                             />
 
@@ -183,7 +190,10 @@ const CreatePlanPage = () => {
 
                             {/* コンセプト選択 */}
                             <Divider sx={{ my: 3 }} />
-                            <BasicConceptSelect
+                            <Select
+                                options={concepts}
+                                value={parentPlan.conceptId || "default"}
+                                label="旅行のコンセプト"
                                 onChange={(value) => {
                                     setParentPlan({ ...parentPlan, conceptId: value });
                                 }}
@@ -245,10 +255,8 @@ const CreatePlanPage = () => {
                                         inputProps={{ readOnly: true }}
                                         sx={{ width: 120 }}
                                     />
-                                    <CountIconButtonGroups
-                                        handleCountUp={handleCountUp}
-                                        handleCountDown={handleCountDown}
-                                    />
+                                    <CountUpIconButton handleCountUp={handleCountUp} />
+                                    <CountDownIconButton handleCountDown={handleCountDown} />
                                 </Stack>
                             )}
                         </CardContent>
@@ -274,9 +282,24 @@ const CreatePlanPage = () => {
                 {/* 操作ボタン */}
                 <Grid2 size={{ xs: 12 }}>
                     <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-                        <CreateButton handleClick={() => handleSaveAll("Published")} />
-                        <DraftButton handleClick={() => handleSaveAll("Draft")} />
-                        <CancelButton />
+                        <Button
+                            label="公開"
+                            onClick={() => handleSaveAll("Published")}
+                            variant="contained"
+                            sx={{ backgroundColor: "#4CAF50" }}
+                        />
+                        <Button
+                            label="下書き"
+                            onClick={() => handleSaveAll("Draft")}
+                            variant="contained"
+                            sx={{ backgroundColor: "#FFC107" }}
+                        />
+                        <Button
+                            label="一覧に戻る"
+                            href="/plans"
+                            variant="contained"
+                            sx={{ backgroundColor: "#9E9E9E" }}
+                        />
                     </Box>
                 </Grid2>
             </Grid2>

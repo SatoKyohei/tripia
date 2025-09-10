@@ -1,12 +1,20 @@
 "use client";
-import { Box, Container, Divider, Stack, Typography } from "@mui/material";
+import { Box, Container, Divider, Grid2, Stack, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import PlanListCards from "@/components/layouts/PlanListCards";
-import BasicFilter from "@/components/elements/Filter/Basic/BasicFilter";
-import BasicSort from "@/components/elements/Sort/Basic/BasicSort";
-import BasicButton from "@/components/elements/Button/Basic/BasicButton";
+import BasicFilter from "@/components/elements/Filter/Filter";
+import BasicSort from "@/components/elements/Sort/Sort";
+import Button from "@/components/elements/Button/Button";
 import { ParentPlan } from "@/types/type";
+import PlanListCard from "@/components/module/PlanListCard/PlanListCard";
+
+const filterOptions = [
+    { value: "all", label: "すべて" },
+    { value: "Draft", label: "下書き" },
+    { value: "Published", label: "公開済み" },
+];
+
+const sortOptions = ["新しい順", "古い順"];
 
 const PlanListPage = () => {
     const [plans, setPlans] = useState<ParentPlan[]>([]);
@@ -73,11 +81,11 @@ const PlanListPage = () => {
                 alignItems={{ xs: "flex-start", sm: "center" }}
             >
                 <Stack direction="row" spacing={2}>
-                    <BasicSort onChange={setSort} />
-                    <BasicFilter onChange={setFilter} />
+                    <BasicSort onChange={setSort} options={sortOptions} defaultValue="新しい順" />
+                    <BasicFilter onChange={setFilter} options={filterOptions} defaultValue="all" />
                 </Stack>
-                <BasicButton
-                    buttonName="プランを作成する"
+                <Button
+                    label="プランを作成する"
                     color="success"
                     component="button"
                     href="/plans/create"
@@ -87,7 +95,13 @@ const PlanListPage = () => {
 
             {/* プランカード一覧 */}
             <Box sx={{ mt: 6 }}>
-                <PlanListCards plans={filteredAndSortedPlans} />
+                <Grid2 container spacing={3}>
+                    {filteredAndSortedPlans.map((plan) => (
+                        <Grid2 key={plan.parentPlanId} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+                            <PlanListCard plan={plan} />
+                        </Grid2>
+                    ))}
+                </Grid2>
             </Box>
         </Container>
     );

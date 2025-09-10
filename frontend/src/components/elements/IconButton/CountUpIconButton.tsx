@@ -1,22 +1,11 @@
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import BasicIconButton from "@/components/elements/IconButton/Basic/BasicIconButton";
+import IconButton from "@/components/elements/IconButton/IconButton";
 
-// 課題：レイアウトを修正
-// 課題：直接手入力がうまくいかないわけではないが使いづらい
-
-type CountUpIconButtonProps = {
-    handleCountUp: () => void;
-};
-
-const CountUpIconButton = (props: CountUpIconButtonProps) => {
-    const { handleCountUp } = props;
-
+const CountUpIconButton = (props: { handleCountUp: () => void }) => {
     return (
-        <>
-            <BasicIconButton color="info" onClick={handleCountUp} size="medium">
-                <AddCircleOutlineIcon />
-            </BasicIconButton>
-        </>
+        <IconButton color="info" onClick={props.handleCountUp} size="medium">
+            <AddCircleOutlineIcon />
+        </IconButton>
     );
 };
 

@@ -2,7 +2,6 @@
 import {
     Avatar,
     Box,
-    Button,
     Card,
     CardContent,
     Divider,
@@ -12,7 +11,7 @@ import {
     Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-
+import Button from "@/components/elements/Button/Button"; // Replace Material UI Button
 
 const DashboardPage = () => {
     const [thumbnail, setThumbnail] = useState("");
@@ -51,7 +50,6 @@ const DashboardPage = () => {
     return (
         <Box sx={{ p: 4, maxWidth: "900px", margin: "0 auto" }}>
             <Stack spacing={3} alignItems="center">
-
                 {/* プロフィール */}
                 <Avatar src={thumbnail} alt="profile" sx={{ width: 120, height: 120, mb: 1 }} />
                 <Typography variant="h5" component="div">
@@ -59,7 +57,6 @@ const DashboardPage = () => {
                 </Typography>
 
                 <Grid2 container spacing={3}>
-
                     {/* ユーザー情報カード */}
                     <Grid2 size={{ xs: 12, md: 6 }}>
                         <Card sx={{ p: 2 }}>
@@ -86,11 +83,10 @@ const DashboardPage = () => {
                                         onChange={(e) => setEmail(e.target.value)}
                                     />
                                     <Button
+                                        label={isEditing ? "保存" : "変更する"}
                                         variant="contained"
                                         onClick={() => setIsEditing((prev) => !prev)}
-                                    >
-                                        {isEditing ? "保存" : "変更する"}
-                                    </Button>
+                                    />
                                 </Stack>
                             </CardContent>
                         </Card>
@@ -108,7 +104,7 @@ const DashboardPage = () => {
                                     <Typography variant="body1">作成したプラン数：5</Typography>
                                     <Typography variant="body1">参加予定のプラン：2</Typography>
                                     <Typography variant="body1">お気に入りの場所：3</Typography>
-                                    <Button variant="outlined">もっと見る</Button>
+                                    <Button label="もっと見る" variant="outlined" />
                                 </Stack>
                             </CardContent>
                         </Card>
@@ -123,12 +119,12 @@ const DashboardPage = () => {
                                 </Typography>
                                 <Divider sx={{ mb: 2 }} />
                                 <Stack direction="row" spacing={2}>
-                                    <Button variant="contained" color="error">
-                                        ログアウト
-                                    </Button>
-                                    <Button variant="outlined" color="secondary">
-                                        アカウント削除
-                                    </Button>
+                                    <Button label="ログアウト" variant="contained" color="error" />
+                                    <Button
+                                        label="アカウント削除"
+                                        variant="outlined"
+                                        color="secondary"
+                                    />
                                 </Stack>
                             </CardContent>
                         </Card>
@@ -140,4 +136,3 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
-

@@ -3,7 +3,7 @@ import { Box, Stack, TextField } from "@mui/material";
 import cuid from "cuid";
 import DateTimePickerGroups from "@/components/elements/DateTimePicker/DateTimePickerGroups";
 import CountUpIconButton from "@/components/elements/IconButton/CountUpIconButton";
-import ChildPlanButtonGroups from "@/components/elements/Button/ChildPlanButtonGroups";
+import Button from "@/components/elements/Button/Button"; // Replace Material UI Button
 import type { ChildPlanType } from "@/types/type";
 
 type ChildPlanProps = {
@@ -30,7 +30,14 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
             userId: "default-user-id", // Provide a default value if userId is missing
         };
 
-        setChildPlans((prev) => [...prev, newTempPlan]);
+        setChildPlans((prev) => [
+            ...prev,
+            {
+                ...newTempPlan,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            },
+        ]);
 
         if (!parentPlanId) {
             return;
@@ -82,7 +89,7 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
                 return;
             }
 
-            const {createdAt, updatedAt, ...targetPlan} = tempPlan;
+            const { createdAt, updatedAt, ...targetPlan } = tempPlan;
 
             try {
                 const response = await fetch(
@@ -216,10 +223,20 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
                                     handleChange(plan.childPlanId, "memo", e.target.value);
                                 }}
                             />
-                            <ChildPlanButtonGroups
-                                onDuplicate={() => handleDuplicate(plan.childPlanId)}
-                                onDelete={() => handleDelete(plan.childPlanId)}
-                            />
+                            <Stack direction="row" spacing={2}>
+                                <Button
+                                    label="複製"
+                                    variant="contained"
+                                    sx={{ backgroundColor: "#2196F3" }}
+                                    onClick={() => handleDuplicate(plan.childPlanId)}
+                                />
+                                <Button
+                                    label="削除"
+                                    variant="contained"
+                                    sx={{ backgroundColor: "#F44336" }}
+                                    onClick={() => handleDelete(plan.childPlanId)}
+                                />
+                            </Stack>
                         </Stack>
                     );
                 })}

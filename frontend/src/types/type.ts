@@ -64,6 +64,8 @@ export type ChildPlanType = {
     checkOutTime: string | null;
     memo: string | null;
     userId: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type PlanWithChildren = {

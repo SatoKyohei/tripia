@@ -190,6 +190,8 @@
   - Googleの新規登録
   - Googleのログイン
   - フロントエンドリファクタリング
+    - DateTimePicker
+    - LocationSelect
 - 対応済み
   - 子プランも認証ありに変更
   - ヘッダー
@@ -218,3 +220,14 @@
   - バックエンドリファクタリング
     - ESLint
     - ステータスコード
+  - フロントエンドリファクタリング
+    - Buttonコンポーネント
+    - Selectコンポーネント
+    - Filter
+    - Sort
+    - Logo
+    - Menu
+    - StatusSelect
+    - IconButton
+    - ImageUploader
+    - PlanListCard

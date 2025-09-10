@@ -2,7 +2,11 @@ import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import Link from "next/link";
 import { ParentPlan } from "@/types/type";
 
-const BasicPlanListCard = ({ plan }: { plan: ParentPlan }) => {
+type PlanListCardProps = {
+    plan: ParentPlan;
+};
+
+const PlanListCard = ({ plan }: PlanListCardProps) => {
     return (
         <Link href={`plans/${plan.parentPlanId}`} style={{ textDecoration: "none" }}>
             <Card
@@ -49,5 +53,4 @@ const BasicPlanListCard = ({ plan }: { plan: ParentPlan }) => {
     );
 };
 
-export default BasicPlanListCard;
-
+export default PlanListCard;

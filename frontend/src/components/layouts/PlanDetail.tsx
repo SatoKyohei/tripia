@@ -15,13 +15,13 @@ import DateTimePickerGroups from "@/components/elements/DateTimePicker/DateTimeP
 import LocationSelectGroups from "@/components/elements/LocationSelect/LocationSelectGroups";
 import ChildPlan from "@/components/layouts/ChildPlan";
 import { ParentPlan, ChildPlanType } from "@/types/type";
-import DetailPageButtonGroups from "@/components/elements/Button/DetailPageButtonGroups";
-import { getPrefectureIdByAreaId } from "@/data/locationMaster";
-import BasicStatusSelect from "@/components/elements/StatusSelect/Basic/BasicStatusSelect";
+import { getPrefectureIdByAreaId } from "@/data/locationList";
 import ImageUploader from "@/components/elements/ImageUploader/ImageUploader";
-import BasicConceptSelect from "@/components/elements/ConceptSelect/Basic/BasicConceptSelect";
+import Select from "@/components/elements/Select/Select";
+import Button from "@/components/elements/Button/Button";
+import { conceptList } from "@/data/conceptList";
+import { statusList } from "@/data/statusList";
 
-// 課題：DetailPageButtonGroups ⇨ EditButtonにpropsを受け渡している。冗長な気がする。
 // 課題：ChildPlan.tsxに定義しているhandleChangeをDateTimePickerGroupsに指定。ただ、グローバルの状態管理した方がいいかも
 
 type PlanDetailProps = {
@@ -29,6 +29,16 @@ type PlanDetailProps = {
     childPlans: ChildPlanType[];
     setChildPlans: React.Dispatch<React.SetStateAction<ChildPlanType[]>>;
 };
+
+const concepts = conceptList.map((concept) => ({
+    id: concept.conceptId,
+    name: concept.conceptName,
+}));
+
+const statuses = statusList.map((status) => ({
+    id: status.statusId,
+    name: status.statusName,
+}));
 
 const PlanDetail = ({ parentPlan, childPlans, setChildPlans }: PlanDetailProps) => {
     const [plan, setPlan] = useState<ParentPlan>(parentPlan);
@@ -122,9 +132,13 @@ const PlanDetail = ({ parentPlan, childPlans, setChildPlans }: PlanDetailProps) 
                                 }
                                 sx={{ mb: 2 }}
                             />
-                            <BasicStatusSelect
-                                status={plan.status}
-                                onChange={(value) => handleChange(plan.status, "status", value)}
+                            <Select
+                                options={statuses}
+                                value={statuses.find((s) => s.id === plan.status)?.id || "default"}
+                                label="記事のステータス"
+                                onChange={(value) => {
+                                    handleChange(plan.status, "status", value);
+                                }}
                             />
                             <Divider sx={{ my: 3 }} />
                             <Typography variant="subtitle1" sx={{ mb: 1 }}>
@@ -148,8 +162,12 @@ const PlanDetail = ({ parentPlan, childPlans, setChildPlans }: PlanDetailProps) 
                                 }
                             />
                             <Divider sx={{ my: 3 }} />
-                            <BasicConceptSelect
-                                conceptId={plan.conceptId}
+                            <Select
+                                options={concepts}
+                                value={
+                                    concepts.find((c) => c.id === plan.conceptId)?.id || "default"
+                                }
+                                label="旅行のコンセプト"
                                 onChange={(value) => {
                                     handleChange(plan.parentPlanId, "conceptId", value);
                                 }}
@@ -204,9 +222,23 @@ const PlanDetail = ({ parentPlan, childPlans, setChildPlans }: PlanDetailProps) 
                 {/* 操作ボタン */}
                 <Grid2 size={{ xs: 12 }}>
                     <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-                        <DetailPageButtonGroups
-                            handleDelete={() => handleDelete(parentPlan.parentPlanId)}
-                            handleDuplicate={() => handleDuplicate(parentPlan.parentPlanId)}
+                        <Button
+                            label="複製"
+                            variant="contained"
+                            sx={{ backgroundColor: "#2196F3" }}
+                            onClick={() => handleDuplicate(parentPlan.parentPlanId)}
+                        />
+                        <Button
+                            label="削除"
+                            variant="contained"
+                            sx={{ backgroundColor: "#F44336" }}
+                            onClick={() => handleDelete(parentPlan.parentPlanId)}
+                        />
+                        <Button
+                            label="一覧に戻る"
+                            variant="contained"
+                            sx={{ backgroundColor: "#9E9E9E" }}
+                            href="/plans"
                         />
                     </Box>
                 </Grid2>
