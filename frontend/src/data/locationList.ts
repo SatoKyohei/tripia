@@ -43,3 +43,7 @@ export const getPrefectureIdByAreaId = (id: string) => {
     const area = areaList.find((area) => area.areaId === id);
     return area?.prefectureId;
 };
+
+export const getFilterdAreaList = (prefectureId: string | undefined) => {
+    return areaList.filter((area) => area.prefectureId === prefectureId);
+};

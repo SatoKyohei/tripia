@@ -15,7 +15,7 @@ import DateTimePickerGroups from "@/components/elements/DateTimePicker/DateTimeP
 import LocationSelectGroups from "@/components/elements/LocationSelect/LocationSelectGroups";
 import ChildPlan from "@/components/layouts/ChildPlan";
 import { ParentPlan, ChildPlanType } from "@/types/type";
-import { getPrefectureIdByAreaId } from "@/data/locationList";
+import { getFilterdAreaList, getPrefectureIdByAreaId, prefectureList } from "@/data/locationList";
 import ImageUploader from "@/components/elements/ImageUploader/ImageUploader";
 import Select from "@/components/elements/Select/Select";
 import Button from "@/components/elements/Button/Button";
@@ -43,10 +43,19 @@ const statuses = statusList.map((status) => ({
 const PlanDetail = ({ parentPlan, childPlans, setChildPlans }: PlanDetailProps) => {
     const [plan, setPlan] = useState<ParentPlan>(parentPlan);
     const [imageURL, setImageURL] = useState<string | null>(null);
+    const [startPrefectureId, setStartPrefectureId] = useState<string | undefined>(
+        getPrefectureIdByAreaId(plan.startAreaId),
+    );
+    const [endPrefectureId, setEndPrefectureId] = useState<string | undefined>(
+        getPrefectureIdByAreaId(plan.endAreaId),
+    );
+
     const router = useRouter();
     const token = localStorage.getItem("access_token");
-    const startPrefectureId = getPrefectureIdByAreaId(plan.startAreaId);
-    const endPrefectureId = getPrefectureIdByAreaId(plan.endAreaId);
+
+    const filterdStartAreaList = getFilterdAreaList(startPrefectureId);
+    const filterdEndAreaList = getFilterdAreaList(endPrefectureId);
+
 
     useEffect(() => {
         if (plan.planThumbnail) setImageURL(plan.planThumbnail);
@@ -186,8 +195,18 @@ const PlanDetail = ({ parentPlan, childPlans, setChildPlans }: PlanDetailProps) 
                                 startAreaId={plan.startAreaId}
                                 endPrefectureId={endPrefectureId}
                                 endAreaId={plan.endAreaId}
-                                parentPlanId={plan.parentPlanId}
-                                handleChange={handleChange}
+                                prefectureOptions={prefectureList}
+                                startAreaOptions={filterdStartAreaList}
+                                endAreaOptions={filterdEndAreaList}
+                                onChange={(key, value) => {
+                                    if (key === "startAreaId" || key === "endAreaId") {
+                                        handleChange(plan.parentPlanId, key, value);
+                                    } else if (key === "startPrefectureId") {
+                                        setStartPrefectureId(value);
+                                    } else if (key === "endPrefectureId") {
+                                        setEndPrefectureId(value);
+                                    }
+                                }}
                             />
                             <Divider sx={{ my: 3 }} />
                             <DateTimePickerGroups

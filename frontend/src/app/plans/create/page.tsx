@@ -25,6 +25,7 @@ import Select from "@/components/elements/Select/Select";
 import { conceptList } from "@/data/conceptList";
 import CountUpIconButton from "@/components/elements/IconButton/CountUpIconButton";
 import CountDownIconButton from "@/components/elements/IconButton/CountDownIconButton";
+import { getFilterdAreaList, getPrefectureIdByAreaId, prefectureList } from "@/data/locationList";
 
 // 課題：createページじゃなくてモーダルで表現した方がカッコいいかも？
 // 課題：作成中にやっぱ手動作成に変えたいってなった時、情報が保持されるようにする
@@ -54,8 +55,17 @@ const CreatePlanPage = () => {
         endAreaId: "",
         conceptId: "",
     });
-
     const [childPlans, setChildPlans] = useState<ChildPlanType[]>([]);
+
+    const [startPrefectureId, setStartPrefectureId] = useState<string | undefined>(
+        getPrefectureIdByAreaId(parentPlan.startAreaId),
+    );
+    const [endPrefectureId, setEndPrefectureId] = useState<string | undefined>(
+        getPrefectureIdByAreaId(parentPlan.endAreaId),
+    );
+
+    const filterdStartAreaList = getFilterdAreaList(startPrefectureId);
+    const filterdEndAreaList = getFilterdAreaList(endPrefectureId);
 
     const router = useRouter();
 
@@ -209,10 +219,23 @@ const CreatePlanPage = () => {
                         <CardContent>
                             {/* 場所選択 */}
                             <LocationSelectGroups
+                                startPrefectureId={startPrefectureId}
                                 startAreaId={parentPlan.startAreaId}
+                                endPrefectureId={endPrefectureId}
                                 endAreaId={parentPlan.endAreaId}
-                                onLocalChange={(key, value) => {
-                                    setParentPlan((prev) => ({ ...prev, [key]: value }));
+                                prefectureOptions={prefectureList}
+                                startAreaOptions={filterdStartAreaList}
+                                endAreaOptions={filterdEndAreaList}
+                                onChange={(key, value) => {
+                                    if (key === "startPrefectureId") {
+                                        setStartPrefectureId(value);
+                                        // prefecture変更時に areaId をリセットするのもアリ
+                                    } else if (key === "endPrefectureId") {
+                                        setEndPrefectureId(value);
+                                    } else {
+                                        // areaId は parentPlan に保存
+                                        setParentPlan((prev) => ({ ...prev, [key]: value }));
+                                    }
                                 }}
                             />
 
