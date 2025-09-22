@@ -6,7 +6,7 @@ import BasicFilter from "@/components/elements/Filter/Filter";
 import BasicSort from "@/components/elements/Sort/Sort";
 import Button from "@/components/elements/Button/Button";
 import { ParentPlan } from "@/types/type";
-import PlanListCard from "@/components/module/PlanListCard/PlanListCard";
+import PlanListCard from "@/components/module/PlanListCard";
 
 const filterOptions = [
     { value: "all", label: "すべて" },

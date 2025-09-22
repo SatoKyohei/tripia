@@ -1,10 +1,15 @@
 "use client";
-import { Box, Stack, TextField } from "@mui/material";
+import { Box } from "@mui/material";
 import cuid from "cuid";
-import DateTimePickerGroups from "@/components/elements/DateTimePicker/DateTimePickerGroups";
 import CountUpIconButton from "@/components/elements/IconButton/CountUpIconButton";
-import Button from "@/components/elements/Button/Button"; // Replace Material UI Button
 import type { ChildPlanType } from "@/types/type";
+import {
+    createChildPlan,
+    deleteChildPlan,
+    duplicateChildPlan,
+    updateChildPlan,
+} from "@/services/childPlanApi";
+import ChildPlanItem from "@/components/module/childPlanItem";
 
 type ChildPlanProps = {
     childPlans?: ChildPlanType[];
@@ -16,10 +21,11 @@ type ChildPlanProps = {
 const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildPlanProps) => {
     const token = localStorage.getItem("access_token");
 
+    // 子プラン追加処理
     const handleCountUp = async () => {
         if (!childPlans) return;
         const tempId = cuid();
-        const newTempPlan = {
+        const newTempPlan: Omit<ChildPlanType, "createdAt" | "updatedAt"> = {
             childPlanId: tempId,
             parentPlanId: parentPlanId ?? "",
             order: childPlans.length + 1,
@@ -27,7 +33,7 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
             checkInTime: null,
             checkOutTime: null,
             memo: "",
-            userId: "default-user-id", // Provide a default value if userId is missing
+            userId: "default-user-id",
         };
 
         setChildPlans((prev) => [
@@ -46,25 +52,7 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
         const { childPlanId, ...planDataForAPI } = newTempPlan;
 
         try {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/create`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify(planDataForAPI),
-                },
-            );
-
-            if (!response.ok) {
-                console.error("Failed to create child plan");
-                return;
-            }
-
-            const responseData = await response.json();
-            const { newChildPlan } = responseData;
+            const { newChildPlan } = await createChildPlan(planDataForAPI, token ?? "");
 
             setChildPlans((prev) =>
                 prev.map((plan) => (plan.childPlanId === tempId ? newChildPlan : plan)),
@@ -74,7 +62,9 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
         }
     };
 
+    // 子プラン編集処理
     const handleChange = async (childPlanId: string, key: keyof ChildPlanType, value: string) => {
+        // 状態の更新のみ
         setChildPlans((prev) => {
             const updatedPlans = prev.map((plan) =>
                 plan.childPlanId === childPlanId ? { ...plan, [key]: value } : plan,
@@ -82,6 +72,7 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
             return updatedPlans;
         });
 
+        // 編集ページ用: AutoSave機能の実装
         if (autoSave) {
             const tempPlan = childPlans?.find((plan) => plan.childPlanId === childPlanId);
             if (!tempPlan) {
@@ -92,27 +83,14 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
             const { createdAt, updatedAt, ...targetPlan } = tempPlan;
 
             try {
-                const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/update`,
-                    {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({ ...targetPlan, [key]: value }),
-                    },
-                );
-
-                if (!response.ok) {
-                    console.error("Failed to update child plan");
-                }
+                await updateChildPlan(targetPlan, key, value, token ?? "");
             } catch (error) {
                 console.error("Error during child plan update:", error);
             }
         }
     };
 
+    // 子プラン削除処理
     const handleDelete = async (childPlanId: string) => {
         if (!setChildPlans) return;
 
@@ -121,22 +99,11 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
             return;
         }
 
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/${childPlanId}`,
-            {
-                method: "Delete",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                credentials: "include",
-            },
-        );
-
-        const { remainingChildPlans } = await response.json();
+        const { remainingChildPlans } = await deleteChildPlan(childPlanId, token ?? "");
         setChildPlans(remainingChildPlans);
     };
 
+    // 子プラン複製処理
     const handleDuplicate = async (childPlanId: string) => {
         if (!childPlans || !setChildPlans) return;
 
@@ -146,6 +113,7 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
             return childPlans;
         }
 
+        // 作成ページ用：状態としてのみ保持
         if (!autoSave) {
             const newChildPlan = {
                 ...targetPlan,
@@ -159,36 +127,20 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
 
             setChildPlans(updatedPlans);
             return;
+        } else {
+            // 編集ページ用：AutoSave機能の実装
+            const { newChildPlan } = await duplicateChildPlan(childPlanId, token ?? "");
+
+            const updatedPlans = [
+                ...childPlans.slice(0, targetPlan.order),
+                newChildPlan,
+                ...childPlans.slice(targetPlan.order),
+            ];
+
+            setChildPlans(updatedPlans);
+
+            return updatedPlans;
         }
-
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/${targetPlan.childPlanId}/duplicate`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                credentials: "include",
-            },
-        );
-
-        if (!response.ok) {
-            console.error("Failed to duplicate child plan");
-            return childPlans;
-        }
-
-        const { newChildPlan } = await response.json();
-
-        const updatedPlans = [
-            ...childPlans.slice(0, targetPlan.order),
-            newChildPlan,
-            ...childPlans.slice(targetPlan.order),
-        ];
-
-        setChildPlans(updatedPlans);
-
-        return updatedPlans;
     };
 
     return (
@@ -197,47 +149,13 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
                 childPlans.map((plan) => {
                     if (!plan) return null;
                     return (
-                        <Stack key={plan.childPlanId} spacing={2} sx={{ mb: 10 }}>
-                            <TextField
-                                label="目的地"
-                                defaultValue={plan.locationName}
-                                onBlur={(e) =>
-                                    handleChange(plan.childPlanId, "locationName", e.target.value)
-                                }
-                            />
-
-                            <DateTimePickerGroups
-                                startDateTime={plan.checkInTime}
-                                endDateTime={plan.checkOutTime}
-                                onStartDateTimeChange={(value) =>
-                                    handleChange(plan.childPlanId, "checkInTime", value ?? "")
-                                }
-                                onEndDateTimeChange={(value) =>
-                                    handleChange(plan.childPlanId, "checkOutTime", value ?? "")
-                                }
-                            />
-                            <TextField
-                                label="メモ"
-                                defaultValue={plan.memo}
-                                onBlur={(e) => {
-                                    handleChange(plan.childPlanId, "memo", e.target.value);
-                                }}
-                            />
-                            <Stack direction="row" spacing={2}>
-                                <Button
-                                    label="複製"
-                                    variant="contained"
-                                    sx={{ backgroundColor: "#2196F3" }}
-                                    onClick={() => handleDuplicate(plan.childPlanId)}
-                                />
-                                <Button
-                                    label="削除"
-                                    variant="contained"
-                                    sx={{ backgroundColor: "#F44336" }}
-                                    onClick={() => handleDelete(plan.childPlanId)}
-                                />
-                            </Stack>
-                        </Stack>
+                        <ChildPlanItem
+                            key={plan.childPlanId}
+                            plan={plan}
+                            handleChange={handleChange}
+                            handleDelete={handleDelete}
+                            handleDuplicate={handleDuplicate}
+                        />
                     );
                 })}
 

@@ -197,8 +197,22 @@
 -   次（以下どの順からやっても OK）
     -   Google の新規登録
     -   Google のログイン
+    -   バックエンド
+        -   seed.ts
+        -   コメント入れる
     -   フロントエンドリファクタリング
-        -   DateTimePicker
+        -   page.tsx:詳細
+        -   page.tsx:create
+            -   PlanDetailで作ったコンポーネントに差し替え
+        -   page.tsx:一覧
+        -   page.tsx:signin
+        -   page.tsx:signup
+        -   page.tsx:dashboard
+        -   data ディレクトリ
+        -   libs ディレクトリ
+        -   types ディレクトリ
+        -   eslint
+        -   コメント入れる
 -   対応済み
     -   子プランも認証ありに変更
     -   ヘッダー
@@ -240,3 +254,8 @@
         -   PlanListCard
         -   LocationSelect
         -   create、編集ページのサムネアップロードがおかしい
+        -   DateTimePicker
+        -   Header
+        -   ChildPlan
+        -   layouts ディレクトリ
+            -   PlanDetail

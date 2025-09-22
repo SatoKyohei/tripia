@@ -84,6 +84,7 @@ const CreatePlanPage = () => {
         }
     };
 
+    // 親プラン保存
     const saveParentPlan = async (status: "Draft" | "Published") => {
         const token = localStorage.getItem("access_token");
 
@@ -98,6 +99,11 @@ const CreatePlanPage = () => {
         });
 
         const data = await response.json();
+        // parentPlanId, userId, createdAt, updatedAtがないエラー。Omitする？
+        //  const requestPlanData = { ...parentPlan, status };
+
+        // const data = await createParentPlan(requestPlanData, token ?? "");
+
         const newParentPlanId = data.parentPlanId;
 
         if (!newParentPlanId) throw new Error("親プランの保存に失敗しました");

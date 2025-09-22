@@ -1,28 +1,17 @@
 "use client";
-import {
-    Box,
-    Card,
-    CardContent,
-    CardHeader,
-    Divider,
-    Grid2,
-    TextField,
-    Typography,
-} from "@mui/material";
+import { Box, Card, CardContent, CardHeader, Grid2 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import DateTimePickerGroups from "@/components/elements/DateTimePicker/DateTimePickerGroups";
-import LocationSelectGroups from "@/components/elements/LocationSelect/LocationSelectGroups";
 import ChildPlan from "@/components/layouts/ChildPlan";
 import { ParentPlan, ChildPlanType } from "@/types/type";
 import { getFilterdAreaList, getPrefectureIdByAreaId, prefectureList } from "@/data/locationList";
-import ImageUploader from "@/components/elements/ImageUploader/ImageUploader";
-import Select from "@/components/elements/Select/Select";
 import Button from "@/components/elements/Button/Button";
 import { conceptList } from "@/data/conceptList";
 import { statusList } from "@/data/statusList";
+import { deleteParentPlan, duplicateParentPlan, updateParentPlan } from "@/services/parentPlanApi";
+import PlanOverviewSection from "@/components/module/PlanOverviewSection";
+import PlanLocationAndDatetimeSection from "@/components/module/PlanLocationAndDatetimeSection";
 
-// 課題：ChildPlan.tsxに定義しているhandleChangeをDateTimePickerGroupsに指定。ただ、グローバルの状態管理した方がいいかも
 
 type PlanDetailProps = {
     parentPlan: ParentPlan;
@@ -30,6 +19,7 @@ type PlanDetailProps = {
     setChildPlans: React.Dispatch<React.SetStateAction<ChildPlanType[]>>;
 };
 
+// セレクトボックス用のオプション化
 const concepts = conceptList.map((concept) => ({
     id: concept.conceptId,
     name: concept.conceptName,
@@ -43,6 +33,8 @@ const statuses = statusList.map((status) => ({
 const PlanDetail = ({ parentPlan, childPlans, setChildPlans }: PlanDetailProps) => {
     const [plan, setPlan] = useState<ParentPlan>(parentPlan);
     const [imageURL, setImageURL] = useState<string | null>(null);
+
+    // エリアセレクトボックスの絞り込み用state
     const [startPrefectureId, setStartPrefectureId] = useState<string | undefined>(
         getPrefectureIdByAreaId(plan.startAreaId),
     );
@@ -50,178 +42,75 @@ const PlanDetail = ({ parentPlan, childPlans, setChildPlans }: PlanDetailProps) 
         getPrefectureIdByAreaId(plan.endAreaId),
     );
 
-    const router = useRouter();
-    const token = localStorage.getItem("access_token");
-
+    // エリアリストの絞り込み
     const filterdStartAreaList = getFilterdAreaList(startPrefectureId);
     const filterdEndAreaList = getFilterdAreaList(endPrefectureId);
 
+    const router = useRouter();
+    const token = localStorage.getItem("access_token");
 
+    // planThumbnail が変わったら imageURL を更新
     useEffect(() => {
         if (plan.planThumbnail) setImageURL(plan.planThumbnail);
     }, [plan.planThumbnail]);
 
+    // 親プラン更新処理
     const handleChange = async (parentPlanId: string, key: keyof ParentPlan, value: string) => {
         const updatedPlan = { ...plan, [key]: value };
 
-        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/plans/update`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            // credentials: "include",
-            body: JSON.stringify(updatedPlan),
-        })
-            .then((response) => {
-                return response;
-            })
-            .catch((error) => {
-                console.error("Failed to save child plan");
-                return;
-            });
-
-        setPlan(updatedPlan);
+        try {
+            await updateParentPlan(updatedPlan, token ?? "");
+            setPlan(updatedPlan);
+        } catch (error) {
+            console.error("親プラン更新に失敗しました:", error);
+        }
     };
 
+    // 親プラン削除処理
     const handleDelete = async (parentPlanId: string) => {
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/plans/${parentPlanId}/delete`,
-            {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                // credentials: "include",
-            },
-        );
-
-        if (response.ok) {
+        try {
+            await deleteParentPlan(parentPlanId, token ?? "");
             router.push("/plans");
-        } else {
+        } catch (error) {
             console.error("削除に失敗しました");
         }
-        // 課題：一覧ページで削除する場合は、useStateで管理しているplansから除外してあげる必要がある。
     };
 
+    // 親プラン複製処理
     const handleDuplicate = async (parentPlanId: string) => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/plans/duplicate`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            // credentials: "include",
-            body: JSON.stringify({ parentPlanId }),
-        });
-
-        if (response.ok) {
+        try {
+            await duplicateParentPlan(parentPlanId, token ?? "");
             router.push("/plans");
-        } else {
+        } catch (error) {
             console.error("Failed to duplicate plan");
         }
-        // 課題：一覧ページで複製する場合は、再レンダリングするように処理を追加するだけで勝手に更新されるはず？
     };
 
     return (
         <Box sx={{ p: 4 }}>
             <Grid2 container spacing={4}>
                 {/* 左カラム */}
-                <Grid2 size={{ xs: 12, md: 6 }}>
-                    <Card>
-                        <CardHeader title="プラン概要" />
-                        <CardContent>
-                            <TextField
-                                fullWidth
-                                label="タイトル"
-                                value={plan.planName}
-                                onChange={(e) =>
-                                    handleChange(plan.parentPlanId, "planName", e.target.value)
-                                }
-                                sx={{ mb: 2 }}
-                            />
-                            <Select
-                                options={statuses}
-                                value={statuses.find((s) => s.id === plan.status)?.id || "default"}
-                                label="記事のステータス"
-                                onChange={(value) => {
-                                    handleChange(plan.status, "status", value);
-                                }}
-                            />
-                            <Divider sx={{ my: 3 }} />
-                            <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                                サムネイル画像
-                            </Typography>
-                            <ImageUploader
-                                parentPlanId={parentPlan.parentPlanId}
-                                imageURL={imageURL}
-                                setImageURL={setImageURL}
-                                autoUpload={true}
-                            />
-                            <Divider sx={{ my: 3 }} />
-                            <TextField
-                                fullWidth
-                                multiline
-                                rows={3}
-                                label="目的"
-                                value={plan.purpose}
-                                onChange={(e) =>
-                                    handleChange(plan.parentPlanId, "purpose", e.target.value)
-                                }
-                            />
-                            <Divider sx={{ my: 3 }} />
-                            <Select
-                                options={concepts}
-                                value={
-                                    concepts.find((c) => c.id === plan.conceptId)?.id || "default"
-                                }
-                                label="旅行のコンセプト"
-                                onChange={(value) => {
-                                    handleChange(plan.parentPlanId, "conceptId", value);
-                                }}
-                            />
-                        </CardContent>
-                    </Card>
-                </Grid2>
+                <PlanOverviewSection
+                    plan={plan}
+                    handleChange={handleChange}
+                    concepts={concepts}
+                    statuses={statuses}
+                    imageURL={imageURL}
+                    setImageURL={setImageURL}
+                />
 
                 {/* 右カラム */}
-                <Grid2 size={{ xs: 12, md: 6 }}>
-                    <Card sx={{ height: "100%" }}>
-                        <CardHeader title="場所と時間" />
-                        <CardContent>
-                            <LocationSelectGroups
-                                startPrefectureId={startPrefectureId}
-                                startAreaId={plan.startAreaId}
-                                endPrefectureId={endPrefectureId}
-                                endAreaId={plan.endAreaId}
-                                prefectureOptions={prefectureList}
-                                startAreaOptions={filterdStartAreaList}
-                                endAreaOptions={filterdEndAreaList}
-                                onChange={(key, value) => {
-                                    if (key === "startAreaId" || key === "endAreaId") {
-                                        handleChange(plan.parentPlanId, key, value);
-                                    } else if (key === "startPrefectureId") {
-                                        setStartPrefectureId(value);
-                                    } else if (key === "endPrefectureId") {
-                                        setEndPrefectureId(value);
-                                    }
-                                }}
-                            />
-                            <Divider sx={{ my: 3 }} />
-                            <DateTimePickerGroups
-                                startDateTime={plan?.startDateTime ?? ""}
-                                endDateTime={plan?.endDateTime ?? ""}
-                                onStartDateTimeChange={(value) =>
-                                    handleChange(plan.parentPlanId, "startDateTime", value ?? "")
-                                }
-                                onEndDateTimeChange={(value) =>
-                                    handleChange(plan.parentPlanId, "endDateTime", value ?? "")
-                                }
-                            />
-                        </CardContent>
-                    </Card>
-                </Grid2>
+                <PlanLocationAndDatetimeSection
+                    plan={plan}
+                    handleChange={handleChange}
+                    startPrefectureId={startPrefectureId}
+                    endPrefectureId={endPrefectureId}
+                    setStartPrefectureId={setStartPrefectureId}
+                    setEndPrefectureId={setEndPrefectureId}
+                    prefectureList={prefectureList}
+                    filterdStartAreaList={filterdStartAreaList}
+                    filterdEndAreaList={filterdEndAreaList}
+                />
 
                 {/* 子プランセクション */}
                 <Grid2 size={{ xs: 12 }}>
@@ -229,7 +118,7 @@ const PlanDetail = ({ parentPlan, childPlans, setChildPlans }: PlanDetailProps) 
                         <CardHeader title="子プラン" />
                         <CardContent>
                             <ChildPlan
-                                parentPlanId={parentPlan.parentPlanId}
+                                parentPlanId={plan.parentPlanId}
                                 childPlans={childPlans}
                                 setChildPlans={setChildPlans}
                                 autoSave={true}
@@ -245,13 +134,13 @@ const PlanDetail = ({ parentPlan, childPlans, setChildPlans }: PlanDetailProps) 
                             label="複製"
                             variant="contained"
                             sx={{ backgroundColor: "#2196F3" }}
-                            onClick={() => handleDuplicate(parentPlan.parentPlanId)}
+                            onClick={() => handleDuplicate(plan.parentPlanId)}
                         />
                         <Button
                             label="削除"
                             variant="contained"
                             sx={{ backgroundColor: "#F44336" }}
-                            onClick={() => handleDelete(parentPlan.parentPlanId)}
+                            onClick={() => handleDelete(plan.parentPlanId)}
                         />
                         <Button
                             label="一覧に戻る"

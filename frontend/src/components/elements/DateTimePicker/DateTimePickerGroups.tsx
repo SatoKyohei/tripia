@@ -1,8 +1,14 @@
 import { Stack } from "@mui/material";
-import BasicDateTimePicker from "@/components/elements/DateTimePicker/Basic/BasicDateTimePicker";
-import { DateTimePicker } from "@/types/type";
+import BasicDateTimePicker from "@/components/elements/DateTimePicker/DateTimePicker";
 
-const DateTimePickerGroups = (props: DateTimePicker) => {
+type DateTimePickerGroupsProps = {
+    startDateTime?: string | null; // ISO（UTC）
+    endDateTime?: string | null; // ISO（UTC）
+    onStartDateTimeChange: (value: string | null) => void;
+    onEndDateTimeChange: (value: string | null) => void;
+};
+
+const DateTimePickerGroups = (props: DateTimePickerGroupsProps) => {
     return (
         <Stack direction="row" spacing={3}>
             <BasicDateTimePicker
