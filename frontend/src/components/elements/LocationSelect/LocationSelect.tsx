@@ -20,9 +20,7 @@ const LocationSelect = ({ id, label, value, options, onChange }: LocationSelectP
                 value={value ?? ""}
                 onChange={(e) => onChange(e.target.value)}
             >
-                <MenuItem value="">
-                    {label}を選択してください
-                </MenuItem>
+                <MenuItem value="">{label}を選択してください</MenuItem>
                 {options.map((option) => {
                     const locationName =
                         "prefectureName" in option ? option.prefectureName : option.areaName;

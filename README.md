@@ -84,7 +84,6 @@
 
 ## 課題
 
--   ボタンの色（特に下書き保存と複製が被ってる）
 
 <br/>
 <br/>
@@ -126,7 +125,6 @@
         -   ~~バックエンド実装~~
     -   自動作成
         -   外部 API
-        -   リファクタリング
 
 ### ◯ 記事詳細ページ
 
@@ -197,22 +195,6 @@
 -   次（以下どの順からやっても OK）
     -   Google の新規登録
     -   Google のログイン
-    -   バックエンド
-        -   seed.ts
-        -   コメント入れる
-    -   フロントエンドリファクタリング
-        -   page.tsx:詳細
-        -   page.tsx:create
-            -   PlanDetailで作ったコンポーネントに差し替え
-        -   page.tsx:一覧
-        -   page.tsx:signin
-        -   page.tsx:signup
-        -   page.tsx:dashboard
-        -   data ディレクトリ
-        -   libs ディレクトリ
-        -   types ディレクトリ
-        -   eslint
-        -   コメント入れる
 -   対応済み
     -   子プランも認証ありに変更
     -   ヘッダー
@@ -259,3 +241,14 @@
         -   ChildPlan
         -   layouts ディレクトリ
             -   PlanDetail
+        -   page.tsx:create
+        -   page.tsx:詳細
+        -   page.tsx:一覧
+        -   page.tsx:signin
+        -   page.tsx:signup
+        -   page.tsx:dashboard
+        -   data ディレクトリ
+        -   libs ディレクトリ
+        -   servicesディレクトリ
+        -   types ディレクトリ
+        -   eslint

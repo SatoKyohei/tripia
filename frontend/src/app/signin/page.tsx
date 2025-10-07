@@ -4,8 +4,6 @@ import { AuthProvider, AuthResponse, SignInPage as ToolpadSignInPage } from "@to
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { useRouter } from "next/navigation";
 
-// 課題：ヘッダーとの間に空間がある
-
 const providers = [
     { id: "google", name: "Google" },
     { id: "credentials", name: "Email and Password" },
@@ -15,11 +13,13 @@ const SignInPage = () => {
     const theme = useTheme();
     const router = useRouter();
 
+    // サインイン処理
     const signIn = async (provider: AuthProvider, formdata: FormData): Promise<AuthResponse> => {
         try {
             const email = formdata.get("email");
             const password = formdata.get("password");
 
+            // バックエンドにログインリクエストを送信
             const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/login`, {
                 method: "POST",
                 headers: {
@@ -44,28 +44,21 @@ const SignInPage = () => {
         }
     };
 
-    const signUpLink = () => {
-        return (
-            <>
-                新規登録は<Link href="/signup">こちら</Link>
-            </>
-        );
-    };
+    // 新規登録リンク
+    const signUpLink = () => <Link href="/signup">新規登録はこちら</Link>;
 
-    const forgotPasswordLink = () => {
-        return (
-            <>
-                <Link href="/forgotpassword">パスワードを忘れましたか？</Link>
-            </>
-        );
-    };
+    // パスワードリセットリンク
+    const forgotPasswordLink = () => <Link href="/forgotpassword">パスワードを忘れましたか？</Link>;
 
     return (
         <AppProvider theme={theme}>
             <ToolpadSignInPage
                 signIn={signIn}
                 providers={providers}
-                slots={{ signUpLink: signUpLink, forgotPasswordLink: forgotPasswordLink }}
+                slots={{
+                    signUpLink,
+                    forgotPasswordLink,
+                }}
             />
         </AppProvider>
     );

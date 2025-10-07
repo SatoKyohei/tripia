@@ -9,11 +9,11 @@ import {
 } from "@mui/material";
 import ImageUploader from "@/components/elements/ImageUploader/ImageUploader";
 import Select from "@/components/elements/Select/Select";
-import { ParentPlan } from "@/types/type";
+import { ParentPlanType } from "@/types/type";
 
 type PlanOverviewSectionProps = {
-    plan: ParentPlan;
-    handleChange: (parentPlanId: string, key: keyof ParentPlan, value: string) => void;
+    plan: ParentPlanType;
+    handleChange: (parentPlanId: string, key: keyof ParentPlanType, value: string) => void;
     concepts: { id: string; name: string }[];
     statuses: { id: string; name: string }[];
     imageURL: string | null;

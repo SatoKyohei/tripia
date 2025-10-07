@@ -1,3 +1,4 @@
+// コンセプトリストを定義
 export const conceptList = [
     { conceptId: "default", conceptName: "選択してください" },
     { conceptId: "relax", conceptName: "リラックス" },

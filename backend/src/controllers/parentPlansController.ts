@@ -58,10 +58,11 @@ export class ParentPlansController extends Controller {
         try {
             this.getUserIdOrThrow(request);
 
-            const plans = await parentPlanService.getParentAndChildPlans(parentPlanId);
+            const parentAndChildPlans =
+                await parentPlanService.getParentAndChildPlans(parentPlanId);
 
             this.setStatus(HTTP_STATUS.OK);
-            return plans;
+            return parentAndChildPlans;
         } catch (error) {
             this.setStatus(HTTP_STATUS.INTERNAL_SERVER_ERROR);
             console.error(error);

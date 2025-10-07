@@ -1,4 +1,5 @@
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+
 import IconButton from "@/components/elements/IconButton/IconButton";
 
 const CountUpIconButton = (props: { handleCountUp: () => void }) => {

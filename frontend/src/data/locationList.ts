@@ -1,3 +1,5 @@
+// エリアリストを定義
+// 各エリアは後述のprefectureList.prefectureIdを含んでいます
 export const areaList = [
     { areaId: "tokyo_toshinn", areaName: "都心3区", prefectureId: "tokyo" },
     { areaId: "tokyo_fukutoshinn", areaName: "副都心4区", prefectureId: "tokyo" },
@@ -29,6 +31,7 @@ export const areaList = [
     { areaId: "gunnma_hokumou", areaName: "北毛エリア", prefectureId: "gunnma" },
 ];
 
+// 都道府県リストを定義
 export const prefectureList = [
     { prefectureId: "tokyo", prefectureName: "東京" },
     { prefectureId: "chiba", prefectureName: "千葉" },
@@ -39,11 +42,13 @@ export const prefectureList = [
     { prefectureId: "tochigi", prefectureName: "栃木" },
 ];
 
+// エリアIDから都道府県IDを取得するユーティリティ関数
 export const getPrefectureIdByAreaId = (id: string) => {
     const area = areaList.find((area) => area.areaId === id);
     return area?.prefectureId;
 };
 
+// 都道府県IDからエリアリストをフィルタリングするユーティリティ関数
 export const getFilterdAreaList = (prefectureId: string | undefined) => {
     return areaList.filter((area) => area.prefectureId === prefectureId);
 };

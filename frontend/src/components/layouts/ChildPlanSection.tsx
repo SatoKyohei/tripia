@@ -18,7 +18,12 @@ type ChildPlanProps = {
     autoSave?: boolean;
 };
 
-const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildPlanProps) => {
+const ChildPlanSection = ({
+    parentPlanId,
+    childPlans,
+    setChildPlans,
+    autoSave,
+}: ChildPlanProps) => {
     const token = localStorage.getItem("access_token");
 
     // 子プラン追加処理
@@ -164,4 +169,4 @@ const ChildPlan = ({ parentPlanId, childPlans, setChildPlans, autoSave }: ChildP
     );
 };
 
-export default ChildPlan;
+export default ChildPlanSection;

@@ -1,55 +1,68 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
 import globals from "globals";
-import tsParser from "@typescript-eslint/parser";
+import pluginJs from "@eslint/js";
+import tseslint from "typescript-eslint";
+import prettier from "eslint-config-prettier";
+import prettierPlugin from "eslint-plugin-prettier";
+import security from "eslint-plugin-security";
+import sonarjs from "eslint-plugin-sonarjs";
+import importPlugin from "eslint-plugin-import";
+import reactPlugin from "eslint-plugin-react";
+import nextPlugin from "@next/eslint-plugin-next";
 
-import pluginTypeScript from "@typescript-eslint/eslint-plugin";
-import pluginImport from "eslint-plugin-import";
-import pluginReact from "eslint-plugin-react";
+/** @type {import('eslint').Linter.Config[]} */
+export default [
+    { files: ["**/*.{js,mjs,cjs,ts,tsx}"] },
+    { languageOptions: { globals: globals.browser } },
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-});
-
-const eslintConfig = [
+    // 除外するファイル・ディレクトリを追加
     {
-        ignores: [".next/*", "node_modules/*", "dist/*", "build/*"],
+        ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "dist/**", ".git/**"],
     },
-    ...compat.extends("next/core-web-vitals", "next/typescript"),
+    
+    pluginJs.configs.recommended,
+    ...tseslint.configs.recommended,
+    prettier,
+
+    // すべてのプラグインを一箇所で定義
     {
-        files: ["**/*.{js,jsx,ts,tsx}"],
-        languageOptions: {
-            parser: tsParser,
-            globals: {
-                ...globals.browser,
-                ...globals.es2021,
-                ...globals.node,
-            },
-        },
         plugins: {
-            "@typescript-eslint": pluginTypeScript,
-            import: pluginImport,
-            react: pluginReact,
+            prettier: prettierPlugin,
+            react: reactPlugin,
+            next: nextPlugin,
+            security: security,
+            sonarjs: sonarjs,
+            import: importPlugin,
         },
         rules: {
-            "import/order": "error",
+            "prettier/prettier": "warn",
+
+            // インポート順序
+            "import/order": [
+                "warn",
+                {
+                    groups: ["builtin", "external", "internal"],
+                    "newlines-between": "always",
+                },
+            ],
+
+            // 未使用変数
             "no-unused-vars": "off",
-            "@typescript-eslint/no-unused-vars": "off",
-            semi: ["error", "always"],
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+            ],
+
+            // console制限
             "no-console": ["error", { allow: ["error"] }],
-            "react/react-in-jsx-scope": "off",
-            "react/jsx-uses-react": "off",
+
+            // その他のルール
             eqeqeq: "error",
             "@typescript-eslint/no-empty-object-type": "off",
-        },
-        linterOptions: {
-            reportUnusedDisableDirectives: true,
+            "@typescript-eslint/explicit-function-return-type": "warn",
+            "@typescript-eslint/no-explicit-any": "warn",
+            "no-magic-numbers": ["warn", { ignore: [0, 1] }],
         },
     },
-];
 
-export default eslintConfig;
+    { linterOptions: { reportUnusedDisableDirectives: true } },
+];

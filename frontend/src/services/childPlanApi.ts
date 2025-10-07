@@ -1,12 +1,16 @@
 // バックエンドAPI（childPlan）へのリクエストをまとめたファイル
-
 import { ChildPlanType } from "@/types/type";
 
+// リクエストヘッダーを生成する関数
+// 引数: token（認証トークン）
 const headers = (token: string) => ({
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
 });
 
+// 子プランを作成する関数
+// 引数: planData（作成する子プランのデータ）、token（認証トークン）
+// 戻り値: 作成された子プランのデータ
 export const createChildPlan = async (
     planData: Omit<ChildPlanType, "childPlanId" | "createdAt" | "updatedAt">,
     token: string,
@@ -22,6 +26,9 @@ export const createChildPlan = async (
     return await response.json();
 };
 
+// 子プランを更新する関数
+// 引数: planData（更新する子プランのデータ）、key（更新するフィールド）、value（更新する値）、token（認証トークン）
+// 戻り値: なし
 export const updateChildPlan = async (
     planData: Omit<ChildPlanType, "createdAt" | "updatedAt">,
     key: keyof ChildPlanType,
@@ -37,6 +44,9 @@ export const updateChildPlan = async (
     if (!response.ok) throw new Error("Failed to update child plan");
 };
 
+// 子プランを削除する関数
+// 引数: childPlanId（削除する子プランのID）、token（認証トークン）
+// 戻り値: 削除された子プランのデータ
 export const deleteChildPlan = async (childPlanId: string, token: string) => {
     const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/${childPlanId}`,
@@ -50,6 +60,9 @@ export const deleteChildPlan = async (childPlanId: string, token: string) => {
     return await response.json();
 };
 
+// 子プランを複製する関数
+// 引数: childPlanId（複製する子プランのID）、token（認証トークン）
+// 戻り値: 複製された子プランのデータ
 export const duplicateChildPlan = async (childPlanId: string, token: string) => {
     const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/child-plans/${childPlanId}/duplicate`,
