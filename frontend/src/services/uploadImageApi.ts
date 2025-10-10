@@ -1,7 +1,7 @@
 // 画像アップロード用の型定義
 // parentPlanId: 親プランのID
 // file: アップロードする画像ファイル
-type UploadImage = {
+type UploadImageProps = {
     parentPlanId: string;
     file: File;
 };
@@ -9,7 +9,7 @@ type UploadImage = {
 // 画像をアップロードする関数
 // 引数: parentPlanId（親プランのID）、file（アップロードする画像ファイル）
 // 戻り値: アップロードされた画像のURL
-export const uploadImage = async ({ parentPlanId, file }: UploadImage) => {
+export const uploadImage = async ({ parentPlanId, file }: UploadImageProps) => {
     if (!file) return; // ファイルが存在しない場合は処理を中断
 
     const formData = new FormData();

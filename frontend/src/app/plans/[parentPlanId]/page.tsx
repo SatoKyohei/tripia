@@ -113,6 +113,7 @@ const PlanDetailPage = ({ params }: { params: Promise<{ parentPlanId: string }> 
                             statuses={statuses}
                             imageURL={imageURL}
                             setImageURL={setImageURL}
+                            autoUpload={true}
                         />
 
                         {/* 右カラム */}

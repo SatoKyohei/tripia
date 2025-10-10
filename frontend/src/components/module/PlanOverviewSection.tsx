@@ -18,6 +18,8 @@ type PlanOverviewSectionProps = {
     statuses: { id: string; name: string }[];
     imageURL: string | null;
     setImageURL: (value: string | null) => void;
+    autoUpload?: boolean;
+    setImageFile?: (file: File | null) => void;
 };
 
 const PlanOverviewSection = ({
@@ -27,6 +29,8 @@ const PlanOverviewSection = ({
     imageURL,
     setImageURL,
     concepts,
+    autoUpload = false,
+    setImageFile
 }: PlanOverviewSectionProps) => {
     return (
         <Grid2 size={{ xs: 12, md: 6 }}>
@@ -58,7 +62,8 @@ const PlanOverviewSection = ({
                         parentPlanId={plan.parentPlanId}
                         imageURL={imageURL}
                         setImageURL={setImageURL}
-                        autoUpload={true}
+                        autoUpload={autoUpload}
+                        onFileSelect={setImageFile}
                     />
                     <Divider sx={{ my: 3 }} />
                     <TextField

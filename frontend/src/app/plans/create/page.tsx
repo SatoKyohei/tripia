@@ -145,6 +145,7 @@ const CreatePlanPage = () => {
                     ]}
                     imageURL={imageURL}
                     setImageURL={setImageURL}
+                    setImageFile={setImageFile}
                 />
 
                 {/* 右カラム：場所と時間 */}
