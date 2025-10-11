@@ -4,10 +4,7 @@ import prisma from "../src/lib/PrismaClient";
 
 async function main() {
     // User
-    const userData = [
-        { name: "user1", email: "user1@example.com", password: "user1" },
-        { name: "user2", email: "user2@example.com", password: "user2" },
-    ];
+    const userData = [{ name: "user1", email: "user1@example.com", password: "user1" }];
 
     const hashedUsers = await Promise.all(
         userData.map(async (user) => ({
@@ -94,10 +91,13 @@ async function main() {
             endAreaId: "gunnma_seimou",
             conceptId: "relax",
             planName: "群馬西毛エリアのリラックス温泉旅行",
+            planThumbnail:
+                "https://tripia-bucket.s3.ap-northeast-1.amazonaws.com/testData/gunmma-onsen.jpg",
             startDateTime: "2025-02-28T09:00:00+09:00",
             endDateTime: "2025-03-02T18:00:00+09:00",
             purpose: "家族4人で温泉",
             status: PlanStatus.Published,
+            createdAt: new Date(),
         },
         {
             email: "user1@example.com",
@@ -105,31 +105,27 @@ async function main() {
             endAreaId: "chiba_minamibousou",
             conceptId: "active",
             planName: "南房総グルメと鴨川シーワールド",
+            planThumbnail:
+                "https://tripia-bucket.s3.ap-northeast-1.amazonaws.com/testData/Kamogawa-Sea-World.webp",
             startDateTime: "2025-03-21T08:30:00+09:00",
             endDateTime: "2025-03-23T20:00:00+09:00",
             purpose: "友達と3人で行くアクティブな旅行",
             status: PlanStatus.Draft,
+            createdAt: new Date(new Date().getTime() + 1000 * 60), // ソート検証のため意図的に時間をずらす
         },
         {
-            email: "user2@example.com",
+            email: "user1@example.com",
             startAreaId: "kanagawa_yokohama",
             endAreaId: "kanagawa_yokohama",
             conceptId: "shoestringTrip",
             planName: "地元横浜の一人観光名所巡り",
+            planThumbnail:
+                "https://tripia-bucket.s3.ap-northeast-1.amazonaws.com/testData/yokohama-hammer-head-8.webp",
             startDateTime: "2025-04-21T10:00:00+09:00",
             endDateTime: "2025-04-21T18:00:00+09:00",
             purpose: "なるべくお金をかけずに観光スポットを巡る",
             status: PlanStatus.Published,
-        },
-        {
-            email: "user2@example.com",
-            startAreaId: "saitama_toubu",
-            endAreaId: "ibaragi_kennou",
-            conceptId: "gourmet",
-            planName: "大洗で海鮮食べ放題ツアー",
-            startDateTime: "2025-06-21T10:30:00+09:00",
-            endDateTime: "2025-06-21T17:00:00+09:00",
-            status: PlanStatus.Draft,
+            createdAt: new Date(new Date().getTime() + 1000 * 60 * 60), // ソート検証のため意図的に時間をずらす
         },
     ];
 
@@ -232,33 +228,6 @@ async function main() {
             locationName: "帰りの移動",
             checkInTime: "2025-04-21T17:30:00+09:00",
             checkOutTime: "2025-04-21T18:00:00+09:00",
-            memo: "",
-        },
-        {
-            parentPlanId: parentPlans[3].parentPlanId,
-            userId: parentPlans[3].userId,
-            order: 1,
-            locationName: "行きの移動",
-            checkInTime: "2025-06-21T10:30:00+09:00",
-            checkOutTime: "2025-06-21T11:30:00+09:00",
-            memo: "",
-        },
-        {
-            parentPlanId: parentPlans[3].parentPlanId,
-            userId: parentPlans[3].userId,
-            order: 2,
-            locationName: "◯◯漁港",
-            checkInTime: "2025-06-21T11:30:00+09:00",
-            checkOutTime: "2025-06-21T16:00:00+09:00",
-            memo: "海鮮丼は必ず食べたい",
-        },
-        {
-            parentPlanId: parentPlans[3].parentPlanId,
-            userId: parentPlans[3].userId,
-            order: 3,
-            locationName: "帰りの移動",
-            checkInTime: "2025-06-21T16:00:00+09:00",
-            checkOutTime: "2025-06-21T17:00:00+09:00",
             memo: "",
         },
     ];

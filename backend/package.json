@@ -6,10 +6,12 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "scripts": {
+    "predev": "npx prisma migrate dev && npx prisma db seed",
     "dev": "concurrently \"nodemon\" \"nodemon -x tsoa spec-and-routes\"",
     "build": "tsoa spec-and-routes && tsc",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "prestart": "npx prisma migrate deploy",
     "start": "node dist/src/index.js"
   },
   "keywords": [],

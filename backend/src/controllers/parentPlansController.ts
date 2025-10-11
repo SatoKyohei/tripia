@@ -86,6 +86,7 @@ export class ParentPlansController extends Controller {
             return { message: "", parentPlanId: newParentPlan.parentPlanId };
         } catch (error) {
             this.setStatus(HTTP_STATUS.BAD_REQUEST);
+            console.error(error);
             return { message: (error as Error).message };
         }
     }
@@ -104,6 +105,7 @@ export class ParentPlansController extends Controller {
             this.setStatus(HTTP_STATUS.CREATED);
         } catch (error) {
             this.setStatus(HTTP_STATUS.BAD_REQUEST);
+            console.error(error);
             return { message: (error as Error).message };
         }
     }
