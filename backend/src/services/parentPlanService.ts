@@ -43,7 +43,7 @@ export const parentPlanService = {
      * @param requestBody リクエストボディ
      * @returns ParentPlan
      */
-    async createParentPlan(userId: string, requestBody: any): Promise<ParentPlan> {
+    async createParentPlan(userId: string, requestBody: ParentPlan): Promise<ParentPlan> {
         const {
             planName,
             planThumbnail,
@@ -84,7 +84,7 @@ export const parentPlanService = {
      * @param requestBody リクエストボディ
      * @return void
      */
-    async updateParentPlan(userId: string, requestBody: any): Promise<void> {
+    async updateParentPlan(userId: string, requestBody: ParentPlan): Promise<void> {
         const {
             parentPlanId,
             planName,
@@ -97,6 +97,14 @@ export const parentPlanService = {
             endAreaId,
             conceptId,
         } = requestBody;
+
+        const existingParentPlan = await prisma.parentPlan.findUnique({
+            where: { parentPlanId },
+        });
+
+        if (!existingParentPlan) {
+            throw new Error(`ParentPlan (id: ${parentPlanId}) が存在しません。`);
+        }
 
         await prisma.parentPlan.update({
             where: { parentPlanId },
@@ -130,7 +138,9 @@ export const parentPlanService = {
             },
         });
 
-        const childPlanIds = childPlanIdsWithParentPlan.map((id) => id.childPlanId);
+        const childPlanIds = childPlanIdsWithParentPlan.map(
+            (id: { childPlanId: string }) => id.childPlanId,
+        );
 
         await prisma.childPlan.deleteMany({
             where: {

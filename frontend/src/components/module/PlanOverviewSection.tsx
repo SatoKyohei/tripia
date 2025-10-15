@@ -7,6 +7,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
+
 import ImageUploader from "@/components/elements/ImageUploader/ImageUploader";
 import Select from "@/components/elements/Select/Select";
 import { ParentPlanType } from "@/types/type";
@@ -18,8 +19,10 @@ type PlanOverviewSectionProps = {
     statuses: { id: string; name: string }[];
     imageURL: string | null;
     setImageURL: (value: string | null) => void;
+    setParentPlan?: (value: ParentPlanType) => void;
     autoUpload?: boolean;
     setImageFile?: (file: File | null) => void;
+    isDetailPage?: boolean;
 };
 
 const PlanOverviewSection = ({
@@ -28,9 +31,11 @@ const PlanOverviewSection = ({
     statuses,
     imageURL,
     setImageURL,
+    setParentPlan,
     concepts,
     autoUpload = false,
-    setImageFile
+    setImageFile,
+    isDetailPage = false,
 }: PlanOverviewSectionProps) => {
     return (
         <Grid2 size={{ xs: 12, md: 6 }}>
@@ -41,8 +46,17 @@ const PlanOverviewSection = ({
                         fullWidth
                         label="タイトル"
                         value={plan.planName}
-                        onChange={(e) =>
-                            handleChange(plan.parentPlanId, "planName", e.target.value)
+                        onChange={(e) => {
+                            if (isDetailPage) {
+                                setParentPlan?.({ ...plan, planName: e.target.value });
+                            } else {
+                                handleChange(plan.parentPlanId, "planName", e.target.value);
+                            }
+                        }}
+                        onBlur={
+                            isDetailPage
+                                ? (e) => handleChange(plan.parentPlanId, "planName", e.target.value)
+                                : undefined
                         }
                         sx={{ mb: 2 }}
                     />
@@ -51,7 +65,7 @@ const PlanOverviewSection = ({
                         value={statuses.find((s) => s.id === plan.status)?.id || "default"}
                         label="記事のステータス"
                         onChange={(value) => {
-                            handleChange(plan.status, "status", value);
+                            handleChange(plan.parentPlanId, "status", value);
                         }}
                     />
                     <Divider sx={{ my: 3 }} />
@@ -72,7 +86,18 @@ const PlanOverviewSection = ({
                         rows={3}
                         label="目的"
                         value={plan.purpose}
-                        onChange={(e) => handleChange(plan.parentPlanId, "purpose", e.target.value)}
+                        onChange={(e) => {
+                            if (isDetailPage) {
+                                setParentPlan?.({ ...plan, purpose: e.target.value });
+                            } else {
+                                handleChange(plan.parentPlanId, "purpose", e.target.value);
+                            }
+                        }}
+                        onBlur={
+                            isDetailPage
+                                ? (e) => handleChange(plan.parentPlanId, "purpose", e.target.value)
+                                : undefined
+                        }
                     />
                     <Divider sx={{ my: 3 }} />
                     <Select

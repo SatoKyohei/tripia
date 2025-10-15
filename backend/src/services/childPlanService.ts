@@ -8,7 +8,7 @@ export const childPlanService = {
      * @param requestBody リクエストボディ
      * @returns 作成された子プラン
      */
-    async createChildPlan(userId: string, requestBody: any): Promise<ChildPlan> {
+    async createChildPlan(userId: string, requestBody: ChildPlan): Promise<ChildPlan> {
         const { parentPlanId, order, locationName, checkInTime, checkOutTime, memo } = requestBody;
 
         const response = await prisma.childPlan.create({
@@ -31,7 +31,7 @@ export const childPlanService = {
      * @param requestBody リクエストボディ
      * @returns void
      */
-    async updateChildPlan(requestBody: any): Promise<void> {
+    async updateChildPlan(requestBody: ChildPlan): Promise<void> {
         const { childPlanId, order, locationName, checkInTime, checkOutTime, memo } = requestBody;
 
         await prisma.childPlan.update({

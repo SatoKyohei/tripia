@@ -1,6 +1,6 @@
 import { Controller, Get, Request, Response, Route, Security } from "tsoa";
-import { User } from "@prisma/client";
 
+import { User } from "../types/userTypes";
 import { ValidateErrorJSON } from "../types/validationTypes";
 import { AuthenticateRequest } from "../middleware/authenticate";
 import { getUserProfile } from "../services/dashboardService";

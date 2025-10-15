@@ -14,8 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 課題：varcharの文字数を再検討（全テーブル共通）
-// ParentPlanとAreaは双方向リレーション
 
 model User {
   userId            String    @id @default(cuid()) @map("user_id")
@@ -77,6 +75,7 @@ model ParentPlan {
   conceptId       String     @map("concept_id")
 
   // 1つのAreaのareaIdを参照し、それをParentPlanの中でstartAreaId, endAreaIdとして使用
+  // ParentPlanとAreaは双方向リレーション
   startArea       Area       @relation("startArea", fields: [startAreaId], references: [areaId]) 
   endArea         Area       @relation("endArea", fields: [endAreaId], references: [areaId]) 
   concept         Concept    @relation(fields: [conceptId], references: [conceptId])
@@ -106,5 +105,3 @@ enum PlanStatus {
   Draft
   Published
 }
-
-//課題：TravelStatus（"Planned" | "Completed"）も作ると、まだ行ってないプランとこれから行くプランで検索の時やりやすくなる。

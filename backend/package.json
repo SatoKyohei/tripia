@@ -11,7 +11,7 @@
     "build": "tsoa spec-and-routes && tsc",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "prestart": "npx prisma migrate deploy",
+    "prestart": "npx prisma migrate deploy && npx prisma db seed",
     "start": "node dist/src/index.js"
   },
   "keywords": [],

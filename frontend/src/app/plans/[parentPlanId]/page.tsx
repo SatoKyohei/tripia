@@ -108,12 +108,14 @@ const PlanDetailPage = ({ params }: { params: Promise<{ parentPlanId: string }> 
                         {/* 左カラム */}
                         <PlanOverviewSection
                             plan={parentPlan}
+                            setParentPlan={setParentPlan}
                             handleChange={handleChange}
                             concepts={concepts}
                             statuses={statuses}
                             imageURL={imageURL}
                             setImageURL={setImageURL}
                             autoUpload={true}
+                            isDetailPage={true}
                         />
 
                         {/* 右カラム */}

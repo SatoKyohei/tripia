@@ -1,4 +1,4 @@
-import { PlanStatus } from "@prisma/client";
+type PlanStatus = "Draft" | "Published";
 
 type ParentPlan = {
     parentPlanId: string;

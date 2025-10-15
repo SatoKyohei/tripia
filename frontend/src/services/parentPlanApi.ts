@@ -52,18 +52,16 @@ export const fetchParentPlan = async (parentPlanId: string, token: string) => {
 // 戻り値: 作成した親プランのID
 export const createParentPlan = async (plan: ParentPlanType, token: string) => {
     try {
-        console.log("parentPlan",plan);
-        console.log("token",token);
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/plans/create`, {
             method: "POST",
             headers: headers(token),
             body: JSON.stringify(plan),
         });
-        console.log("response",response);
+
         if (!response.ok) throw new Error("作成に失敗しました");
 
         const responseData = await response.json();
-        console.log("responseData",responseData);
+
         return responseData.parentPlanId;
     } catch (error) {
         console.error("親プラン作成失敗:", error);

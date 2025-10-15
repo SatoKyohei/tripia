@@ -1,9 +1,10 @@
-import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import Link from "next/link";
-import { ParentPlan } from "@/types/type";
+import { Card, CardContent, CardMedia, Typography } from "@mui/material";
+
+import { ParentPlanType } from "@/types/type";
 
 type PlanListCardProps = {
-    plan: ParentPlan;
+    plan: ParentPlanType;
 };
 
 const PlanListCard = ({ plan }: PlanListCardProps) => {

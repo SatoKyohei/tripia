@@ -1,8 +1,10 @@
+# 開発用：本番ではdocker composeは使用しない
 services:
     frontend:
         build:
             context: ./frontend
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile.dev
+        image: tripia/frontend_dev
         container_name: tripia_frontend
         ports:
             - "3000:3000"
@@ -12,7 +14,8 @@ services:
     backend:
         build:
             context: ./backend
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile.dev
+        image: tripia/backend_dev
         container_name: tripia_backend
         env_file:
             - ./backend/.env
@@ -20,8 +23,6 @@ services:
             - "8080:8080"
         volumes:
             - ./backend:/app
-        environment:
-            - NODE_ENV=development
         command: npm run dev
     db:
         image: postgres:17.2

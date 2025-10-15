@@ -1,7 +1,7 @@
-import { User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+import { User } from "../types/userTypes";
 import { SECRET_KEY } from "../config";
 import prisma from "../lib/PrismaClient";
 
@@ -48,5 +48,5 @@ export const authenticateUser = async (params: LoginParams): Promise<string> => 
         throw new Error("認証に失敗しました");
     }
 
-    return jwt.sign({ userId: user.userId }, SECRET_KEY, { expiresIn: "1h" });
+    return jwt.sign({ userId: user.userId }, SECRET_KEY, { expiresIn: "12h" });
 };

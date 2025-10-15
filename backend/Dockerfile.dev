@@ -1,0 +1,23 @@
+# 公式 Node.js 18 (alpine) イメージをベースにする
+FROM node:18-alpine
+
+# コンテナ内の作業ディレクトリを設定
+WORKDIR /app
+
+# OpenSSL をインストール
+RUN apk add openssl
+
+# package.json と package-lock.json を作業ディレクトリにコピー
+COPY package*.json ./
+
+# 依存関係をインストール
+RUN npm install
+
+# アプリケーションの残りのコードを作業ディレクトリにコピー
+COPY . .
+
+# コンテナがリッスンするポートを指定
+EXPOSE 8080
+
+# アプリケーションを起動するコマンドを定義
+CMD ["npm", "run", "dev"]

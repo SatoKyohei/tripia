@@ -1,11 +1,9 @@
-import { User } from "@prisma/client";
 import { Body, Controller, Get, Path, Post, Response, Route } from "tsoa";
 
+import { User } from "../types/userTypes";
 import { ValidateErrorJSON } from "../types/validationTypes";
 import { createUser, authenticateUser } from "../services/userService";
-
 import { HTTP_STATUS } from "../types/httpStatusTypes";
-
 import prisma from "../lib/PrismaClient";
 import { tokenBlacklist } from "../lib/TokenBlackList";
 
@@ -29,7 +27,7 @@ export class UsersController extends Controller {
     @Post("register")
     public async createUser(
         @Body() requestBody: UserCreationParams,
-    ): Promise<{ message: string; details?: any } | void> {
+    ): Promise<{ message: string; details?: User } | void> {
         try {
             const user = await createUser(requestBody);
             this.setStatus(HTTP_STATUS.CREATED);

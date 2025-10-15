@@ -76,7 +76,7 @@ export class ParentPlansController extends Controller {
     @Post("create")
     public async createParentPlan(
         @Request() request: AuthenticateRequest,
-        @Body() requestBody: any,
+        @Body() requestBody: ParentPlan,
     ): Promise<{ message?: string; parentPlanId?: string }> {
         try {
             const userId = this.getUserIdOrThrow(request);
@@ -97,7 +97,7 @@ export class ParentPlansController extends Controller {
     @Put("update")
     public async updateParentPlan(
         @Request() request: AuthenticateRequest,
-        @Body() requestBody: any,
+        @Body() requestBody: ParentPlan,
     ): Promise<{ message?: string } | void> {
         try {
             const userId = this.getUserIdOrThrow(request);
