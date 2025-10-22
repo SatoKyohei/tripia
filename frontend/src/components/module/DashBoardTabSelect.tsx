@@ -8,16 +8,26 @@ type DashBoardTabSelectProps = {
 
 const DashBoardTabSelect = ({ selectedTab, handleTabChange }: DashBoardTabSelectProps) => {
     return (
-        <Box sx={{ width: "20%", borderRight: "1px solid #ddd" }}>
+        <Box
+            sx={{
+                width: "100%",
+                borderBottom: "1px solid #ddd",
+                overflowX: "auto",
+                whiteSpace: "nowrap",
+            }}
+        >
             <Tabs
-                orientation="vertical"
+                orientation="horizontal"
                 value={selectedTab}
                 onChange={handleTabChange}
-                sx={{ height: "100%" }}
+                sx={{
+                    width: "100%",
+                    minWidth: 600,
+                }}
             >
-                <Tab label="ユーザー情報" />
-                <Tab label="アクティビティ" />
-                <Tab label="アカウント操作" />
+                <Tab label="ユーザー情報" sx={{ minWidth: 150 }} />
+                <Tab label="アクティビティ" sx={{ minWidth: 150 }} />
+                <Tab label="アカウント操作" sx={{ minWidth: 150 }} />
             </Tabs>
         </Box>
     );
