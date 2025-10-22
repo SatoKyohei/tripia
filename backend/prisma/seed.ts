@@ -124,7 +124,7 @@ async function main() {
             conceptId: "active",
             planName: "南房総グルメと鴨川シーワールド",
             planThumbnail:
-                "https://tripia-bucket.s3.ap-northeast-1.amazonaws.com/testData/Kamogawa-Sea-World.webp",
+                "https://tripia-bucket.s3.ap-northeast-1.amazonaws.com/testData/Kamogawa-Sea-World.jpg",
             startDateTime: "2025-03-21T08:30:00+09:00",
             endDateTime: "2025-03-23T20:00:00+09:00",
             purpose: "友達と3人で行くアクティブな旅行",
@@ -138,7 +138,7 @@ async function main() {
             conceptId: "shoestringTrip",
             planName: "地元横浜の一人観光名所巡り",
             planThumbnail:
-                "https://tripia-bucket.s3.ap-northeast-1.amazonaws.com/testData/yokohama-hammer-head-8.webp",
+                "https://tripia-bucket.s3.ap-northeast-1.amazonaws.com/testData/yokohama-hammer-head.jpg",
             startDateTime: "2025-04-21T10:00:00+09:00",
             endDateTime: "2025-04-21T18:00:00+09:00",
             purpose: "なるべくお金をかけずに観光スポットを巡る",

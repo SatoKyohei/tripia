@@ -2,6 +2,7 @@
 
 import { Box, Card, CardContent, CardMedia, Container, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+
 import Button from "@/components/elements/Button/Button"; // Replace Material UI Button
 
 export default function Home() {

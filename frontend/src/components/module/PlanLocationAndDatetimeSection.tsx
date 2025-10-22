@@ -24,8 +24,8 @@ type PlanLocationAndDatetimeSectionProps = {
     setStartPrefectureId: (id: string | undefined) => void;
     setEndPrefectureId: (id: string | undefined) => void;
     prefectureList: { prefectureId: string; prefectureName: string }[];
-    filterdStartAreaList: { areaId: string; areaName: string; prefectureId: string }[];
-    filterdEndAreaList: { areaId: string; areaName: string; prefectureId: string }[];
+    filteredStartAreaList: { areaId: string; areaName: string; prefectureId: string }[];
+    filteredEndAreaList: { areaId: string; areaName: string; prefectureId: string }[];
     isAutoCreatePlan?: boolean;
     childPlanCount?: number;
     incrementChildPlanCount?: () => void;
@@ -41,8 +41,8 @@ const PlanLocationAndDatetimeSection = ({
     setStartPrefectureId,
     setEndPrefectureId,
     prefectureList,
-    filterdStartAreaList,
-    filterdEndAreaList,
+    filteredStartAreaList,
+    filteredEndAreaList,
     isAutoCreatePlan,
     childPlanCount,
     incrementChildPlanCount,
@@ -60,8 +60,8 @@ const PlanLocationAndDatetimeSection = ({
                         endPrefectureId={endPrefectureId}
                         endAreaId={plan.endAreaId}
                         prefectureOptions={prefectureList}
-                        startAreaOptions={filterdStartAreaList}
-                        endAreaOptions={filterdEndAreaList}
+                        startAreaOptions={filteredStartAreaList}
+                        endAreaOptions={filteredEndAreaList}
                         onChange={(key, value) => {
                             if (key === "startAreaId" || key === "endAreaId") {
                                 handleChange(plan.parentPlanId, key, value);

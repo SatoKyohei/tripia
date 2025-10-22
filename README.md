@@ -176,9 +176,19 @@ docker ps -a
 cd tripia
 
 # イメージビルド
-docker buildx build --platform linux/amd64 -t tripia/frontend:v1.0 -f frontend/Dockerfile.prod ./frontend/
+docker buildx build --platform linux/amd64 -t tripia/frontend:latest -f frontend/Dockerfile.prod ./frontend/
+docker buildx build --platform linux/amd64 -t tripia/backend:latest -f backend/Dockerfile.prod ./backend/
 
-docker buildx build --platform linux/amd64 -t tripia/backend:v1.0 -f backend/Dockerfile.prod ./backend/
+# タグ
+docker tag tripia/frontend:latest 793830179252.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/frontend:latest
+docker tag tripia/backend:latest 793830179252.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/backend:latest
+
+# awsログイン
+aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 793830179252.dkr.ecr.ap-northeast-1.amazonaws.com
+
+# ECRにプッシュ
+docker push 793830179252.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/frontend:latest
+docker push 793830179252.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/backend:latest
 ```
 
 4. AWS RDS をデプロイ

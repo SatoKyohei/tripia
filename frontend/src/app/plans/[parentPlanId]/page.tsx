@@ -2,6 +2,7 @@
 import { Box, Card, CardContent, CardHeader, Container, Grid2 } from "@mui/material";
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
 import { ParentPlanType, ChildPlanType } from "@/types/type";
 import {
     fetchParentPlan,
@@ -9,7 +10,7 @@ import {
     duplicateParentPlan,
     updateParentPlan,
 } from "@/services/parentPlanApi";
-import { getFilterdAreaList, getPrefectureIdByAreaId, prefectureList } from "@/data/locationList";
+import { getFilteredAreaList, getPrefectureIdByAreaId, prefectureList } from "@/data/locationList";
 import Button from "@/components/elements/Button/Button";
 import { conceptList } from "@/data/conceptList";
 import { statusList } from "@/data/statusList";
@@ -43,8 +44,8 @@ const PlanDetailPage = ({ params }: { params: Promise<{ parentPlanId: string }> 
     }));
 
     // エリアリストの絞り込み
-    const filterdStartAreaList = getFilterdAreaList(startPrefectureId);
-    const filterdEndAreaList = getFilterdAreaList(endPrefectureId);
+    const filteredStartAreaList = getFilteredAreaList(startPrefectureId);
+    const filteredEndAreaList = getFilteredAreaList(endPrefectureId);
 
 
     // 初回レンダリング時に親プランと子プランを取得
@@ -127,8 +128,8 @@ const PlanDetailPage = ({ params }: { params: Promise<{ parentPlanId: string }> 
                             setStartPrefectureId={setStartPrefectureId}
                             setEndPrefectureId={setEndPrefectureId}
                             prefectureList={prefectureList}
-                            filterdStartAreaList={filterdStartAreaList}
-                            filterdEndAreaList={filterdEndAreaList}
+                            filteredStartAreaList={filteredStartAreaList}
+                            filteredEndAreaList={filteredEndAreaList}
                         />
 
                         {/* 子プランセクション */}

@@ -2,12 +2,13 @@
 import { Box, Card, CardContent, CardHeader, Grid2 } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+
 import ChildPlanSection from "@/components/layouts/ChildPlanSection";
 import Button from "@/components/elements/Button/Button";
 import { ChildPlanType, ParentPlanType } from "@/types/type";
 import { uploadImage } from "@/services/uploadImageApi";
 import { conceptList } from "@/data/conceptList";
-import { getFilterdAreaList, getPrefectureIdByAreaId, prefectureList } from "@/data/locationList";
+import { getFilteredAreaList, getPrefectureIdByAreaId, prefectureList } from "@/data/locationList";
 import PlanOverviewSection from "@/components/module/PlanOverviewSection";
 import PlanLocationAndDatetimeSection from "@/components/module/PlanLocationAndDatetimeSection";
 import { createParentPlan } from "@/services/parentPlanApi";
@@ -56,8 +57,8 @@ const CreatePlanPage = () => {
     }));
 
     // エリアリストの絞り込み
-    const filterdStartAreaList = getFilterdAreaList(startPrefectureId);
-    const filterdEndAreaList = getFilterdAreaList(endPrefectureId);
+    const filteredStartAreaList = getFilteredAreaList(startPrefectureId);
+    const filteredEndAreaList = getFilteredAreaList(endPrefectureId);
 
     // 自動生成する場合の子プランの数の変更
     const incrementChildPlanCount = () => {
@@ -157,8 +158,8 @@ const CreatePlanPage = () => {
                     setStartPrefectureId={setStartPrefectureId}
                     setEndPrefectureId={setEndPrefectureId}
                     prefectureList={prefectureList}
-                    filterdStartAreaList={filterdStartAreaList}
-                    filterdEndAreaList={filterdEndAreaList}
+                    filteredStartAreaList={filteredStartAreaList}
+                    filteredEndAreaList={filteredEndAreaList}
                     isAutoCreatePlan={isAutoCreatePlan}
                     childPlanCount={childPlanCount}
                     incrementChildPlanCount={incrementChildPlanCount}

@@ -1,10 +1,11 @@
 "use client";
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
+
 import DashBoardTabSelect from "@/components/module/DashBoardTabSelect";
 import DashBoardUserInfoTab from "@/components/layouts/DashBoardUserInfoTab";
 import DashBoardActivityTab from "@/components/layouts/DashBoardActivityTab";
-import DashBoardAcountTab from "@/components/layouts/DashBoardAcountTab";
+import DashBoardAccountTab from "@/components/layouts/DashBoardAccountTab";
 
 // タブのインデックスを定数として定義
 const USER_INFO_TAB = 0;
@@ -73,19 +74,42 @@ const DashboardPage = () => {
             case ACTIVITY_TAB:
                 return <DashBoardActivityTab />;
             case ACCOUNT_TAB:
-                return <DashBoardAcountTab />;
+                return <DashBoardAccountTab />;
             default:
                 return null;
         }
     };
 
     return (
-        <Box sx={{ display: "flex", minHeight: "100vh" }}>
-            {/* 左ペインのタブセレクター */}
-            <DashBoardTabSelect selectedTab={selectedTab} handleTabChange={handleTabChange} />
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "column",
+                minHeight: "100vh",
+            }}
+        >
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    width: "100%",
+                    borderBottom: "1px solid #ddd",
+                }}
+            >
+                <DashBoardTabSelect selectedTab={selectedTab} handleTabChange={handleTabChange} />
+            </Box>
 
-            {/* 右ペインのコンテンツ */}
-            <Box sx={{ flex: 1, p: 4 }}>{renderTabContent()}</Box>
+            <Box
+                sx={{
+                    flex: 1,
+                    p: 4,
+                    width: "100%",
+                    boxSizing: "border-box",
+                    overflow: "hidden",
+                }}
+            >
+                {renderTabContent()}
+            </Box>
         </Box>
     );
 };

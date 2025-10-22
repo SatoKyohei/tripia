@@ -2,6 +2,7 @@
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { ReactNode } from "react";
+
 import { AuthProvider } from "@/libs/providers/AuthProvider";
 
 // LocalizationProviderはクライアントサイドでしか動かない

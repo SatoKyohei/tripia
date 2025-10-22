@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Sans_JP } from "next/font/google";
+
 import Header from "@/components/layouts/Header";
 import Providers from "@/libs/providers/Providers";
 import Auth from "@/libs/Auth";

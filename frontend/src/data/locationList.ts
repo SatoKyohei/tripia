@@ -49,6 +49,6 @@ export const getPrefectureIdByAreaId = (id: string) => {
 };
 
 // 都道府県IDからエリアリストをフィルタリングするユーティリティ関数
-export const getFilterdAreaList = (prefectureId: string | undefined) => {
+export const getFilteredAreaList = (prefectureId: string | undefined) => {
     return areaList.filter((area) => area.prefectureId === prefectureId);
 };
