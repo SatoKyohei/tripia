@@ -1,4 +1,5 @@
 import { Stack } from "@mui/material";
+
 import LocationSelect from "@/components/elements/LocationSelect/LocationSelect";
 import { Area, Prefecture } from "@/types/type";
 
@@ -28,13 +29,14 @@ const LocationSelectGroups = ({
 }: LocationSelectGroupsProps) => {
     return (
         <>
-            <Stack direction="row" spacing={3}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
                 <LocationSelect
                     id="start-pref"
                     label="出発地（都道府県）"
                     value={startPrefectureId}
                     options={prefectureOptions}
                     onChange={(value) => onChange("startPrefectureId", value)}
+                    sx={{ flex: 1, minWidth: "calc(50% - 12px)" }}
                 />
                 <LocationSelect
                     id="start-area"
@@ -42,15 +44,17 @@ const LocationSelectGroups = ({
                     value={startAreaId}
                     options={startAreaOptions}
                     onChange={(value) => onChange("startAreaId", value)}
+                    sx={{ flex: 1, minWidth: "calc(50% - 12px)" }}
                 />
             </Stack>
-            <Stack direction="row" spacing={3} mt={2}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ mt: 4 }}>
                 <LocationSelect
                     id="end-pref"
                     label="到着地（都道府県）"
                     value={endPrefectureId}
                     options={prefectureOptions}
                     onChange={(value) => onChange("endPrefectureId", value)}
+                    sx={{ flex: 1, minWidth: "calc(50% - 12px)" }}
                 />
                 <LocationSelect
                     id="end-area"
@@ -58,6 +62,7 @@ const LocationSelectGroups = ({
                     value={endAreaId}
                     options={endAreaOptions}
                     onChange={(value) => onChange("endAreaId", value)}
+                    sx={{ flex: 1, minWidth: "calc(50% - 12px)" }}
                 />
             </Stack>
         </>

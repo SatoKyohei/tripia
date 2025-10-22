@@ -11,7 +11,7 @@ type DateTimePickerGroupsProps = {
 
 const DateTimePickerGroups = (props: DateTimePickerGroupsProps) => {
     return (
-        <Stack direction="row" spacing={3}>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={3}>
             <BasicDateTimePicker
                 label="開始日時"
                 dateTime={props.startDateTime}

@@ -1,5 +1,7 @@
 "use client";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { SxProps } from "@mui/system";
+
 import { Area, Prefecture } from "@/types/type";
 
 type LocationSelectProps = {
@@ -8,11 +10,12 @@ type LocationSelectProps = {
     value: string | undefined;
     options: Area[] | Prefecture[];
     onChange: (value: string) => void;
+    sx?: SxProps; // Add sx prop for custom styling
 };
 
-const LocationSelect = ({ id, label, value, options, onChange }: LocationSelectProps) => {
+const LocationSelect = ({ id, label, value, options, onChange, sx }: LocationSelectProps) => {
     return (
-        <FormControl variant="filled" sx={{ minWidth: 200 }}>
+        <FormControl variant="filled" sx={{ minWidth: 200, ...sx }}>
             <InputLabel id={`${id}-label`}>{label}</InputLabel>
             <Select
                 labelId={`${id}-label`}
