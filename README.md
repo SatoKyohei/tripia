@@ -227,7 +227,7 @@ terraform apply
 <br/>
 
 3. Docker イメージビルド~プッシュ
-  - 「アカウントID」と書かれた部分には自身のIDに読み替えて実行
+  - 「アカウントID」と書かれた部分は自身のAWSアカウントIDに差し替えて実行
 ```
 # プロジェクトトップに移動
 cd tripia
@@ -250,7 +250,7 @@ docker push アカウントID.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/backen
 
 <br/>
 
-4. AWS ECS をデプロイ
+4. AWS ECS をGUIから手動デプロイ
 
 - フロント／バックエンドのタスクの最新リビジョンを作成
   - 先ほどプッシュしたイメージを指定 ⇨ 作成
