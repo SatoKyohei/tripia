@@ -95,7 +95,7 @@ variable "db_port" {
 variable "aws_account_id" {
   description = "AWS account ID"
   type = string
-  default = "793830179252"  
+  sensitive = true
 }
 
 variable "ecr_repository_frontend_name" {
