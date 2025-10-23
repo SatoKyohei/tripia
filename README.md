@@ -104,7 +104,7 @@
 - フロントエンド: React / Next.js / MUI
 - バックエンド: Node.js / Express / TypeScript / Prisma / JWT / Swagger-UI / tsoa
 - データベース: PostgreSQL / AWS RDS
-- インフラ: Docker / Docker Compose / AWS S3 / AWS ELB / AWS ECR / AWS ECS
+- インフラ: Docker / Docker Compose / AWS S3 / AWS ELB / AWS ECR / AWS ECS / terraform
 - その他：Git / GitHub / ESLint / Prettier
 
 <br/>
