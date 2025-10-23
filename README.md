@@ -127,18 +127,54 @@
 git clone <repo-url>
 ```
 
+<br/>
+
 2. AWS セッティング
 
-- S3 をデプロイ
+- ECR で以下リポジトリ作成
+  - tripia/frontend
+  - tripia/backend
+- 「セキュリティ認証情報」でアクセス／シークレットアクセスキーを作成
+- AWS CLIをローカルにインストールしておく
+- AWS 認証情報確認と調整
+```
+# 現在の認証情報を確認
+aws sts get-caller-identity
 
-3. .env.sample をコピーして.env にリネーム
+# （AWSの認証情報が未設定の場合）作成したキーで認証情報を設定
+vi ~/.aws/credentials
+
+[Default]
+aws_access_key_id = AKIAXXXXXXX
+aws_secret_access_key = xxxxxxxxxxxxx
+```
+<br/>
+
+3. 環境変数ファイル作成
+```
+# プロジェクトトップに移動
+cd tripia
+
+# 環境変数ファイル作成
+cp -p frontend/.env.sample frontend/.env
+cp -p backend/.env.sample backend/.env
+cp -p infrastructure/example.tfvars infrastructure/terraform.tfvars
+```
+
+<br/>
+
+4. docker, docker-composeを自環境にインストール
+
 
 ### ■ 開発用
 
-1. フロント／バックエンドの .env の「開発用」を埋める
+1. バックエンドの .env の「開発用」を埋める
 
 - S3 の情報（アクセスキー、シークレットアクセスキー、リージョン名、バケット名）も記述する
 - その他 DB の情報なども
+- フロントエンド／バックエンドともに「本番用」はコメントアウトでOK
+
+<br/>
 
 2. docker-compose 起動
 
@@ -153,24 +189,45 @@ docker compose up -d
 docker ps -a
 ```
 
-2. ブラウザで以下 URL を表示
-   http://localhost:3000
+<br/>
+
+3. ブラウザで URL を表示：http://localhost:3000
 
 ### ■ 本番用
 
-1. AWS ELB をデプロイ
+1. AWS デプロイ
+```
+# terraform ディレクトリトップに移動
+cd tripia/infrastructure
 
-- EC2 でロードバランサー・ターゲットグループをデプロイ
-- フロントとバックエンド用に ALB を 2 つデプロイする
-- ターゲットグループも 2 つ。フロントは 3000 向け、バックエンドは 8080 向けに設定
+# terraform.tfvars の内容を埋める
 
-2. フロントの .env の「本番環境用」を使う
+# 初期化
+terraform init
+
+# 記載内容のバリデーション確認
+terraform validate
+
+# 実施内容確認
+terraform plan
+
+# terraform実行（yesを押下）
+terraform apply
+
+# 出力にフロントエンド／バックエンドALBのDNS名が出力されるので控えておく
+```
+
+<br/>
+
+2. フロントエンドの .env の「本番環境用」を使う
 
 - 開発用はコメントアウトする
-- フロント用にデプロイした ALB の DNS 名を http://に含める
+- バックエンド用にデプロイした ALB の DNS 名を http://に含める
 
-3. Docker イメージビルド
+<br/>
 
+3. Docker イメージビルド~プッシュ
+  - 「アカウントID」と書かれた部分には自身のIDに読み替えて実行
 ```
 # プロジェクトトップに移動
 cd tripia
@@ -180,36 +237,30 @@ docker buildx build --platform linux/amd64 -t tripia/frontend:latest -f frontend
 docker buildx build --platform linux/amd64 -t tripia/backend:latest -f backend/Dockerfile.prod ./backend/
 
 # タグ
-docker tag tripia/frontend:latest 793830179252.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/frontend:latest
-docker tag tripia/backend:latest 793830179252.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/backend:latest
+docker tag tripia/frontend:latest アカウントID.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/frontend:latest
+docker tag tripia/backend:latest アカウントID.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/backend:latest
 
 # awsログイン
-aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 793830179252.dkr.ecr.ap-northeast-1.amazonaws.com
+aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin アカウントID.dkr.ecr.ap-northeast-1.amazonaws.com
 
 # ECRにプッシュ
-docker push 793830179252.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/frontend:latest
-docker push 793830179252.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/backend:latest
+docker push アカウントID.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/frontend:latest
+docker push アカウントID.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/backend:latest
 ```
 
-4. AWS RDS をデプロイ
+<br/>
 
-- 無料期間枠がおすすめ
-- postgreSQL を選択（Aurora は不要）
-- 初期データベース欄を tripia に指定
-- 初期 PW 欄に任意のパスワードを指定
+4. AWS ECS をデプロイ
 
-5. AWS ECR をデプロイ
+- フロント／バックエンドのタスクの最新リビジョンを作成
+  - 先ほどプッシュしたイメージを指定 ⇨ 作成
+- フロント／バックエンドのサービスを更新
+  - 作成した最新リビジョンを指定 ⇨ 更新
+- 起動するまで待つ
 
-- リポジトリ（フロント・バックエンド各 1 つずつ）作成
-- ECR の「プッシュコマンドを表示」を参考に、手順 3.でデプロイしたイメージをプッシュする
+<br/>
 
-6. AWS ECS をデプロイ
-
-- フロント／バックエンドのタスクを 1 つずつ作成
-  - .env の内容と AWS RDS の内容をもとに、環境変数を指定（バックエンドのみ）
-- フロント／バックエンドのサービスを 1 つずつ作成
-
-7. ブラウザで確認
+5. ブラウザで確認
 
 - http://フロント用の ALB の DNS 名
 
@@ -219,6 +270,15 @@ docker push 793830179252.dkr.ecr.ap-northeast-1.amazonaws.com/tripia/backend:lat
 ## 8. 注意点・補足
 
 - デモアカウントは 12 時間で認証の期限が切れます。
+- AWS環境は放っておくと課金するので以下で削除できます。ただし、本番稼働中のものにはNG
+```
+# terraform ディレクトリトップに移動
+cd tripia/infrastructure
+
+# AWS全リソース削除
+terraform destroy
+
+```
 
 <br/>
 <br/>
