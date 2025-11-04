@@ -48,6 +48,19 @@ variable "private_subnet_cidr2" {
   default = "172.31.4.0/24"
 }
 
+## ---------------------- Route53 ---------------------- ##
+variable "tripia_zone_id" {
+  description = "Route53 hosted zone ID"
+  type = string
+  default = "Z07294792SYRIT4R2PKWH"  
+}
+
+variable "tripia_fqdn" {
+  description = "Tripia FQDN"
+  type = string
+  default = "tripia.click"
+}
+
 
 ## ---------------------- S3 ---------------------- ##
 variable "s3_bucket_name" {

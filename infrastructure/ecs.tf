@@ -40,7 +40,7 @@ resource "aws_ecs_service" "frontend" {
   }
 
   # 「ALBリスナーを先に作成してからfrontendサービスを作成」という依存関係の明示。Terraformの独自設定
-  depends_on = [aws_lb_listener.frontend]
+  depends_on = [aws_lb_listener.frontend_http, aws_lb_listener.frontend_https]
 }
 
 # バックエンド
