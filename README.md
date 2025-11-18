@@ -1,12 +1,14 @@
 # プロジェクト名：TRIPIA
-（2025/11/3 追記）本アプリと同名のサービスが存在しますが、当プロジェクトとは一切関係ございません。
+- （2025/11/3 追記）本アプリと同名のサービスが存在しますが、当プロジェクトとは一切関係ございません。
+- 従量課金（AWS）のため、現在は基本的に停止しております。
+
 
 <br/>
 <br/>
 
 ## 1. デモ情報
 
-- URL：http://tripia-frontend-alb-363224005.ap-northeast-1.elb.amazonaws.com
+- URL：https://tripia.click
 - デモアカウント
   - Email：user1@example.com
   - PW：user1
